@@ -1,0 +1,1154 @@
+<!DOCTYPE html>
+<!-- saved from url=(0048)https://thanhvu.dev/2019/06/26/autorelease-pool/ -->
+<html lang="vi-VN" class="jetpack-lazy-images-js-enabled" slick-uniqueid="3"><!--<![endif]--><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><script src="./Autorelease Pool - Thành Vũ_files/sdk.js" async="" crossorigin="anonymous"></script>
+
+<meta name="viewport" content="width=device-width">
+<link rel="profile" href="http://gmpg.org/xfn/11">
+<link rel="pingback" href="https://thanhvu.dev/xmlrpc.php">
+<title>Autorelease Pool - Thành Vũ</title>
+
+<!-- This site is optimized with the Yoast SEO plugin v12.6.2 - https://yoast.com/wordpress/plugins/seo/ -->
+<meta name="robots" content="max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+<link rel="canonical" href="https://thanhvu.dev/2019/06/26/autorelease-pool/">
+<meta property="og:locale" content="vi_VN">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Autorelease Pool - Thành Vũ">
+<meta property="og:description" content="Gần đây mình khá tò mò về chủ đề này, nên mình quyết định tìm hiểu kỹ về nó. Sau khi đã thoả mãn sự tò mò thì nay mình viết bài chia sẻ về nó. 1. Bối cảnh Bạn nào lập trình từ hồi non-arc thì sẽ rõ về autorelease pool hơn các bạn lập trình thời arc. Cùng xét ví dụ sau khi dùng non-arc, thời mà vẫn dùng retain, release bằng tay thay vì ARC(Automatic Reference Counting)...Đọc Thêm Đọc Thêm">
+<meta property="og:url" content="https://thanhvu.dev/2019/06/26/autorelease-pool/">
+<meta property="og:site_name" content="Thành Vũ">
+<meta property="article:author" content="https://www.facebook.com/ServiceError">
+<meta property="article:tag" content="Advance knowledge">
+<meta property="article:tag" content="iOS">
+<meta property="article:tag" content="Memory Management">
+<meta property="article:tag" content="ObjC">
+<meta property="article:section" content="Kiến thức kỹ thuật">
+<meta property="article:published_time" content="2019-06-26T13:22:59+00:00">
+<meta property="article:modified_time" content="2019-07-04T02:24:51+00:00">
+<meta property="og:updated_time" content="2019-07-04T02:24:51+00:00">
+<meta property="og:image" content="https://i1.wp.com/thanhvu.dev/wp-content/uploads/2019/06/EventLoopDiagram1.gif?fit=800%2C600&amp;ssl=1">
+<meta property="og:image:secure_url" content="https://i1.wp.com/thanhvu.dev/wp-content/uploads/2019/06/EventLoopDiagram1.gif?fit=800%2C600&amp;ssl=1">
+<meta property="og:image:width" content="800">
+<meta property="og:image:height" content="600">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:description" content="Gần đây mình khá tò mò về chủ đề này, nên mình quyết định tìm hiểu kỹ về nó. Sau khi đã thoả mãn sự tò mò thì nay mình viết bài chia sẻ về nó. 1. Bối cảnh Bạn nào lập trình từ hồi non-arc thì sẽ rõ về autorelease pool hơn các bạn lập trình thời arc. Cùng xét ví dụ sau khi dùng non-arc, thời mà vẫn dùng retain, release bằng tay thay vì ARC(Automatic Reference Counting)...Đọc Thêm Đọc Thêm">
+<meta name="twitter:title" content="Autorelease Pool - Thành Vũ">
+<meta name="twitter:image" content="https://i1.wp.com/thanhvu.dev/wp-content/uploads/2019/06/EventLoopDiagram1.gif?fit=800%2C600&amp;ssl=1">
+<script async="" src="./Autorelease Pool - Thành Vũ_files/analytics.js"></script><script type="application/ld+json" class="yoast-schema-graph yoast-schema-graph--main">{"@context":"https://schema.org","@graph":[{"@type":["Person","Organization"],"@id":"https://thanhvu.dev/#/schema/person/56bcfe8e386a879d6621417bc4ed1b4e","name":"Th\u00e0nh V\u0169","image":{"@type":"ImageObject","@id":"https://thanhvu.dev/#personlogo","url":"https://i0.wp.com/thanhvu.dev/wp-content/uploads/2019/06/photo-2.jpg?fit=512%2C512&ssl=1","width":512,"height":512,"caption":"Th\u00e0nh V\u0169"},"logo":{"@id":"https://thanhvu.dev/#personlogo"},"sameAs":["https://www.facebook.com/ServiceError"]},{"@type":"WebSite","@id":"https://thanhvu.dev/#website","url":"https://thanhvu.dev/","name":"Th\u00e0nh V\u0169","description":"Blog chia s\u1ebb k\u1ef9 thu\u1eadt IT","publisher":{"@id":"https://thanhvu.dev/#/schema/person/56bcfe8e386a879d6621417bc4ed1b4e"},"potentialAction":{"@type":"SearchAction","target":"https://thanhvu.dev/?s={search_term_string}","query-input":"required name=search_term_string"}},{"@type":"ImageObject","@id":"https://thanhvu.dev/2019/06/26/autorelease-pool/#primaryimage","url":"https://i1.wp.com/thanhvu.dev/wp-content/uploads/2019/06/EventLoopDiagram1.gif?fit=800%2C600&ssl=1","width":800,"height":600},{"@type":"WebPage","@id":"https://thanhvu.dev/2019/06/26/autorelease-pool/#webpage","url":"https://thanhvu.dev/2019/06/26/autorelease-pool/","inLanguage":"vi-VN","name":"Autorelease Pool - Th\u00e0nh V\u0169","isPartOf":{"@id":"https://thanhvu.dev/#website"},"primaryImageOfPage":{"@id":"https://thanhvu.dev/2019/06/26/autorelease-pool/#primaryimage"},"datePublished":"2019-06-26T13:22:59+00:00","dateModified":"2019-07-04T02:24:51+00:00"},{"@type":"Article","@id":"https://thanhvu.dev/2019/06/26/autorelease-pool/#article","isPartOf":{"@id":"https://thanhvu.dev/2019/06/26/autorelease-pool/#webpage"},"author":{"@id":"https://thanhvu.dev/#/schema/person/56bcfe8e386a879d6621417bc4ed1b4e"},"headline":"Autorelease Pool","datePublished":"2019-06-26T13:22:59+00:00","dateModified":"2019-07-04T02:24:51+00:00","commentCount":0,"mainEntityOfPage":{"@id":"https://thanhvu.dev/2019/06/26/autorelease-pool/#webpage"},"publisher":{"@id":"https://thanhvu.dev/#/schema/person/56bcfe8e386a879d6621417bc4ed1b4e"},"image":{"@id":"https://thanhvu.dev/2019/06/26/autorelease-pool/#primaryimage"},"keywords":"Advance knowledge,iOS,Memory Management,ObjC","articleSection":"Ki\u1ebfn th\u1ee9c k\u1ef9 thu\u1eadt"}]}</script>
+<!-- / Yoast SEO plugin. -->
+
+<link rel="dns-prefetch" href="https://s0.wp.com/">
+<link rel="dns-prefetch" href="https://fonts.googleapis.com/">
+<link rel="dns-prefetch" href="https://s.w.org/">
+<link rel="alternate" type="application/rss+xml" title="Dòng thông tin Thành Vũ »" href="https://thanhvu.dev/feed/">
+<link rel="alternate" type="application/rss+xml" title="Dòng phản hồi Thành Vũ »" href="https://thanhvu.dev/comments/feed/">
+<link rel="alternate" type="application/rss+xml" title="Thành Vũ » Autorelease Pool Dòng phản hồi" href="https://thanhvu.dev/2019/06/26/autorelease-pool/feed/">
+		<script type="text/javascript">
+			window._wpemojiSettings = {"baseUrl":"https:\/\/s.w.org\/images\/core\/emoji\/12.0.0-1\/72x72\/","ext":".png","svgUrl":"https:\/\/s.w.org\/images\/core\/emoji\/12.0.0-1\/svg\/","svgExt":".svg","source":{"concatemoji":"https:\/\/thanhvu.dev\/wp-includes\/js\/wp-emoji-release.min.js?ver=5.3.4"}};
+			!function(e,a,t){var r,n,o,i,p=a.createElement("canvas"),s=p.getContext&&p.getContext("2d");function c(e,t){var a=String.fromCharCode;s.clearRect(0,0,p.width,p.height),s.fillText(a.apply(this,e),0,0);var r=p.toDataURL();return s.clearRect(0,0,p.width,p.height),s.fillText(a.apply(this,t),0,0),r===p.toDataURL()}function l(e){if(!s||!s.fillText)return!1;switch(s.textBaseline="top",s.font="600 32px Arial",e){case"flag":return!c([127987,65039,8205,9895,65039],[127987,65039,8203,9895,65039])&&(!c([55356,56826,55356,56819],[55356,56826,8203,55356,56819])&&!c([55356,57332,56128,56423,56128,56418,56128,56421,56128,56430,56128,56423,56128,56447],[55356,57332,8203,56128,56423,8203,56128,56418,8203,56128,56421,8203,56128,56430,8203,56128,56423,8203,56128,56447]));case"emoji":return!c([55357,56424,55356,57342,8205,55358,56605,8205,55357,56424,55356,57340],[55357,56424,55356,57342,8203,55358,56605,8203,55357,56424,55356,57340])}return!1}function d(e){var t=a.createElement("script");t.src=e,t.defer=t.type="text/javascript",a.getElementsByTagName("head")[0].appendChild(t)}for(i=Array("flag","emoji"),t.supports={everything:!0,everythingExceptFlag:!0},o=0;o<i.length;o++)t.supports[i[o]]=l(i[o]),t.supports.everything=t.supports.everything&&t.supports[i[o]],"flag"!==i[o]&&(t.supports.everythingExceptFlag=t.supports.everythingExceptFlag&&t.supports[i[o]]);t.supports.everythingExceptFlag=t.supports.everythingExceptFlag&&!t.supports.flag,t.DOMReady=!1,t.readyCallback=function(){t.DOMReady=!0},t.supports.everything||(n=function(){t.readyCallback()},a.addEventListener?(a.addEventListener("DOMContentLoaded",n,!1),e.addEventListener("load",n,!1)):(e.attachEvent("onload",n),a.attachEvent("onreadystatechange",function(){"complete"===a.readyState&&t.readyCallback()})),(r=t.source||{}).concatemoji?d(r.concatemoji):r.wpemoji&&r.twemoji&&(d(r.twemoji),d(r.wpemoji)))}(window,document,window._wpemojiSettings);
+		</script><script src="./Autorelease Pool - Thành Vũ_files/wp-emoji-release.min(1).js" type="text/javascript" defer=""></script>
+		<style type="text/css">
+img.wp-smiley,
+img.emoji {
+	display: inline !important;
+	border: none !important;
+	box-shadow: none !important;
+	height: 1em !important;
+	width: 1em !important;
+	margin: 0 .07em !important;
+	vertical-align: -0.1em !important;
+	background: none !important;
+	padding: 0 !important;
+}
+</style>
+	<link rel="stylesheet" id="wp-block-library-css" href="./Autorelease Pool - Thành Vũ_files/style.min.css" type="text/css" media="all">
+<link rel="stylesheet" id="bootstrap-css" href="./Autorelease Pool - Thành Vũ_files/bootstrap.css" type="text/css" media="all">
+<link rel="stylesheet" id="font-awesome-css" href="./Autorelease Pool - Thành Vũ_files/font-awesome.min.css" type="text/css" media="all">
+<link rel="stylesheet" id="nisarg-style-css" href="./Autorelease Pool - Thành Vũ_files/style(1).css" type="text/css" media="all">
+<style id="nisarg-style-inline-css" type="text/css">
+	/* Color Scheme */
+
+	/* Accent Color */
+
+	a:active,
+	a:hover,
+	a:focus {
+	    color: #8d9440;
+	}
+
+	.main-navigation .primary-menu > li > a:hover, .main-navigation .primary-menu > li > a:focus {
+		color: #8d9440;
+	}
+	
+	.main-navigation .primary-menu .sub-menu .current_page_item > a,
+	.main-navigation .primary-menu .sub-menu .current-menu-item > a {
+		color: #8d9440;
+	}
+	.main-navigation .primary-menu .sub-menu .current_page_item > a:hover,
+	.main-navigation .primary-menu .sub-menu .current_page_item > a:focus,
+	.main-navigation .primary-menu .sub-menu .current-menu-item > a:hover,
+	.main-navigation .primary-menu .sub-menu .current-menu-item > a:focus {
+		background-color: #fff;
+		color: #8d9440;
+	}
+	.dropdown-toggle:hover,
+	.dropdown-toggle:focus {
+		color: #8d9440;
+	}
+
+	@media (min-width: 768px){
+		.main-navigation .primary-menu > .current_page_item > a,
+		.main-navigation .primary-menu > .current_page_item > a:hover,
+		.main-navigation .primary-menu > .current_page_item > a:focus,
+		.main-navigation .primary-menu > .current-menu-item > a,
+		.main-navigation .primary-menu > .current-menu-item > a:hover,
+		.main-navigation .primary-menu > .current-menu-item > a:focus,
+		.main-navigation .primary-menu > .current_page_ancestor > a,
+		.main-navigation .primary-menu > .current_page_ancestor > a:hover,
+		.main-navigation .primary-menu > .current_page_ancestor > a:focus,
+		.main-navigation .primary-menu > .current-menu-ancestor > a,
+		.main-navigation .primary-menu > .current-menu-ancestor > a:hover,
+		.main-navigation .primary-menu > .current-menu-ancestor > a:focus {
+			border-top: 4px solid #8d9440;
+		}
+		.main-navigation ul ul a:hover,
+		.main-navigation ul ul a.focus {
+			color: #fff;
+			background-color: #8d9440;
+		}
+	}
+
+	.main-navigation .primary-menu > .open > a, .main-navigation .primary-menu > .open > a:hover, .main-navigation .primary-menu > .open > a:focus {
+		color: #8d9440;
+	}
+
+	.main-navigation .primary-menu > li > .sub-menu  li > a:hover,
+	.main-navigation .primary-menu > li > .sub-menu  li > a:focus {
+		color: #fff;
+		background-color: #8d9440;
+	}
+
+	@media (max-width: 767px) {
+		.main-navigation .primary-menu .open .sub-menu > li > a:hover {
+			color: #fff;
+			background-color: #8d9440;
+		}
+	}
+
+	.sticky-post{
+	    background: #8d9440;
+	    color:white;
+	}
+	
+	.entry-title a:hover,
+	.entry-title a:focus{
+	    color: #8d9440;
+	}
+
+	.entry-header .entry-meta::after{
+	    background: #8d9440;
+	}
+
+	.fa {
+		color: #8d9440;
+	}
+
+	.btn-default{
+		border-bottom: 1px solid #8d9440;
+	}
+
+	.btn-default:hover, .btn-default:focus{
+	    border-bottom: 1px solid #8d9440;
+	    background-color: #8d9440;
+	}
+
+	.nav-previous:hover, .nav-next:hover{
+	    border: 1px solid #8d9440;
+	    background-color: #8d9440;
+	}
+
+	.next-post a:hover,.prev-post a:hover{
+	    color: #8d9440;
+	}
+
+	.posts-navigation .next-post a:hover .fa, .posts-navigation .prev-post a:hover .fa{
+	    color: #8d9440;
+	}
+
+
+	#secondary .widget-title::after{
+		background-color: #8d9440;
+	    content: "";
+	    position: absolute;
+	    width: 50px;
+	    display: block;
+	    height: 4px;    
+	    bottom: -15px;
+	}
+
+	#secondary .widget a:hover,
+	#secondary .widget a:focus{
+		color: #8d9440;
+	}
+
+	#secondary .widget_calendar tbody a {
+	    background-color: #8d9440;
+	    color: #fff;
+	    padding: 0.2em;
+	}
+
+	#secondary .widget_calendar tbody a:hover{
+	    background-color: #8d9440;
+	    color: #fff;
+	    padding: 0.2em;
+	}	
+
+</style>
+<link rel="stylesheet" id="nisarggooglefonts-css" href="./Autorelease Pool - Thành Vũ_files/css" type="text/css" media="all">
+<link rel="stylesheet" id="enlighter-local-css" href="./Autorelease Pool - Thành Vũ_files/EnlighterJS.min.css" type="text/css" media="all">
+<link rel="stylesheet" id="social-logos-css" href="./Autorelease Pool - Thành Vũ_files/social-logos.min.css" type="text/css" media="all">
+<link rel="stylesheet" id="jetpack_css-css" href="./Autorelease Pool - Thành Vũ_files/jetpack.css" type="text/css" media="all">
+<script type="text/javascript" src="./Autorelease Pool - Thành Vũ_files/jquery.js"></script>
+<script type="text/javascript" src="./Autorelease Pool - Thành Vũ_files/jquery-migrate.min.js"></script>
+<script type="text/javascript">
+/* <![CDATA[ */
+var related_posts_js_options = {"post_heading":"h4"};
+/* ]]> */
+</script>
+<script type="text/javascript" src="./Autorelease Pool - Thành Vũ_files/related-posts.min.js"></script>
+<!--[if lt IE 9]>
+<script type='text/javascript' src='https://thanhvu.dev/wp-content/themes/nisarg/js/html5shiv.js?ver=3.7.3'></script>
+<![endif]-->
+<!-- OG: 2.7.6 -->
+<link rel="image_src" href="https://i1.wp.com/thanhvu.dev/wp-content/uploads/2019/06/EventLoopDiagram1.gif?fit=800%2C600&amp;ssl=1"><meta itemprop="image" content="https://i1.wp.com/thanhvu.dev/wp-content/uploads/2019/06/EventLoopDiagram1.gif?fit=800%2C600&amp;ssl=1"><meta name="msapplication-TileImage" content="https://i1.wp.com/thanhvu.dev/wp-content/uploads/2019/06/EventLoopDiagram1.gif?fit=800%2C600&amp;ssl=1"><meta property="og:image" content="https://i1.wp.com/thanhvu.dev/wp-content/uploads/2019/06/EventLoopDiagram1.gif?fit=800%2C600&amp;ssl=1"><meta property="og:image:width" content="800"><meta property="og:image:height" content="600"><meta property="og:image:alt" content="EventLoopDiagram1"><meta property="og:description" content="Gần đây mình khá tò mò về chủ đề này, nên mình quyết định tìm hiểu kỹ về nó. Sau khi đã thoả mãn sự tò mò thì nay mình viết bài chia sẻ về nó. 1. Bối cảnh Bạn nào lập trình từ hồi non-arc thì sẽ rõ về autorelease pool hơn các bạn..."><meta property="og:type" content="article"><meta property="og:locale" content="vi_vn"><meta property="og:site_name" content="Thành Vũ"><meta property="og:title" content="Autorelease Pool"><meta property="og:url" content="https://thanhvu.dev/2019/06/26/autorelease-pool/"><meta property="og:updated_time" content="2019-07-04T09:24:51+07:00"><meta property="article:tag" content="Advance knowledge"><meta property="article:tag" content="iOS"><meta property="article:tag" content="Memory Management"><meta property="article:tag" content="ObjC"><meta property="article:published_time" content="2019-06-26T20:22:59+07:00"><meta property="article:modified_time" content="2019-07-04T09:24:51+07:00"><meta property="article:author" content="https://thanhvu.dev/author/admin/"><meta property="article:section" content="Kiến thức kỹ thuật"><meta property="twitter:card" content="summary_large_image"><meta property="twitter:title" content="Autorelease Pool"><meta property="twitter:description" content="Gần đây mình khá tò mò về chủ đề này, nên mình quyết định tìm hiểu kỹ về nó. Sau khi đã thoả mãn sự tò mò thì nay mình viết bài chia sẻ về nó. 1. Bối cảnh Bạn nào lập trình từ hồi non-arc thì sẽ rõ về autorelease pool hơn các bạn..."><meta property="twitter:image:width" content="800"><meta property="twitter:image:height" content="600"><meta property="twitter:image:alt" content="EventLoopDiagram1"><meta property="twitter:url" content="https://thanhvu.dev/2019/06/26/autorelease-pool/"><meta property="profile:first_name" content="Thành"><meta property="profile:last_name" content="Vũ"><meta property="profile:username" content="Thành Vũ"><!-- /OG -->
+<link rel="https://api.w.org/" href="https://thanhvu.dev/wp-json/">
+<link rel="EditURI" type="application/rsd+xml" title="RSD" href="https://thanhvu.dev/xmlrpc.php?rsd">
+<link rel="wlwmanifest" type="application/wlwmanifest+xml" href="https://thanhvu.dev/wp-includes/wlwmanifest.xml"> 
+<meta name="generator" content="WordPress 5.3.4">
+<link rel="shortlink" href="https://thanhvu.dev/?p=147">
+<link rel="alternate" type="application/json+oembed" href="https://thanhvu.dev/wp-json/oembed/1.0/embed?url=https%3A%2F%2Fthanhvu.dev%2F2019%2F06%2F26%2Fautorelease-pool%2F">
+<link rel="alternate" type="text/xml+oembed" href="https://thanhvu.dev/wp-json/oembed/1.0/embed?url=https%3A%2F%2Fthanhvu.dev%2F2019%2F06%2F26%2Fautorelease-pool%2F&amp;format=xml">
+<!-- Analytics by WP-Statistics v12.6.11 - https://wp-statistics.com/ -->
+
+<link rel="dns-prefetch" href="https://widgets.wp.com/">
+<link rel="dns-prefetch" href="https://s0.wp.com/">
+<link rel="dns-prefetch" href="https://0.gravatar.com/">
+<link rel="dns-prefetch" href="https://1.gravatar.com/">
+<link rel="dns-prefetch" href="https://2.gravatar.com/">
+<link rel="dns-prefetch" href="https://jetpack.wordpress.com/">
+<link rel="dns-prefetch" href="https://s1.wp.com/">
+<link rel="dns-prefetch" href="https://s2.wp.com/">
+<link rel="dns-prefetch" href="https://public-api.wordpress.com/">
+<link rel="dns-prefetch" href="https://c0.wp.com/">
+<link rel="dns-prefetch" href="https://i0.wp.com/">
+<link rel="dns-prefetch" href="https://i1.wp.com/">
+<link rel="dns-prefetch" href="https://i2.wp.com/">
+<style type="text/css">img#wpstats{display:none}</style>
+<style type="text/css">
+        .site-header { background: ; }
+</style>
+
+		<style type="text/css" id="nisarg-header-css">
+					.site-header {
+				background: url(https://thanhvu.dev/wp-content/themes/nisarg/images/headers/mountains.png) no-repeat scroll top;
+				background-size: cover;
+			}
+			@media (min-width: 320px) and (max-width: 359px ) {
+				.site-header {
+					height: 80px;
+				}
+			}
+			@media (min-width: 360px) and (max-width: 767px ) {
+				.site-header {
+					height: 90px;
+				}
+			}
+			@media (min-width: 768px) and (max-width: 979px ) {
+				.site-header {
+					height: 192px;
+				}
+			}
+			@media (min-width: 980px) and (max-width: 1279px ){
+				.site-header {
+					height: 245px;
+				}
+			}
+			@media (min-width: 1280px) and (max-width: 1365px ){
+				.site-header {
+					height: 320px;
+				}
+			}
+			@media (min-width: 1366px) and (max-width: 1439px ){
+				.site-header {
+					height: 341px;
+				}
+			}
+			@media (min-width: 1440px) and (max-width: 1599px ) {
+				.site-header {
+					height: 360px;
+				}
+			}
+			@media (min-width: 1600px) and (max-width: 1919px ) {
+				.site-header {
+					height: 400px;
+				}
+			}
+			@media (min-width: 1920px) and (max-width: 2559px ) {
+				.site-header {
+					height: 480px;
+				}
+			}
+			@media (min-width: 2560px)  and (max-width: 2879px ) {
+				.site-header {
+					height: 640px;
+				}
+			}
+			@media (min-width: 2880px) {
+				.site-header {
+					height: 720px;
+				}
+			}
+			.site-header{
+				-webkit-box-shadow: 0px 0px 2px 1px rgba(182,182,182,0.3);
+		    	-moz-box-shadow: 0px 0px 2px 1px rgba(182,182,182,0.3);
+		    	-o-box-shadow: 0px 0px 2px 1px rgba(182,182,182,0.3);
+		    	box-shadow: 0px 0px 2px 1px rgba(182,182,182,0.3);
+			}
+					.site-title,
+			.site-description {
+				color: #fff;
+			}
+			.site-title::after{
+				background: #fff;
+				content:"";
+			}
+				</style>
+					<style type="text/css">
+				/* If html does not have either class, do not show lazy loaded images. */
+				html:not( .jetpack-lazy-images-js-enabled ):not( .js ) .jetpack-lazy-image {
+					display: none;
+				}
+			</style>
+			<script>
+				document.documentElement.classList.add(
+					'jetpack-lazy-images-js-enabled'
+				);
+			</script>
+		<link rel="icon" href="https://i0.wp.com/thanhvu.dev/wp-content/uploads/2019/07/cropped-favicon.png?fit=32%2C32&amp;ssl=1" sizes="32x32">
+<link rel="icon" href="https://i0.wp.com/thanhvu.dev/wp-content/uploads/2019/07/cropped-favicon.png?fit=192%2C192&amp;ssl=1" sizes="192x192">
+<link rel="apple-touch-icon-precomposed" href="https://i0.wp.com/thanhvu.dev/wp-content/uploads/2019/07/cropped-favicon.png?fit=180%2C180&amp;ssl=1">
+<meta name="msapplication-TileImage" content="https://i0.wp.com/thanhvu.dev/wp-content/uploads/2019/07/cropped-favicon.png?fit=270%2C270&amp;ssl=1">
+
+<!-- BEGIN ExactMetrics v5.3.9 Universal Analytics - https://exactmetrics.com/ -->
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-142998212-1', 'auto');
+  ga('send', 'pageview');
+</script>
+<!-- END ExactMetrics Universal Analytics -->
+		<style type="text/css" id="wp-custom-css">
+			#site-navigation {
+	display: none;
+}
+
+
+#cc_spacer {
+	height:0px !important;
+}
+
+article {
+	border-radius: 5px;
+}
+
+aside {
+	border-radius: 5px;
+}
+
+input.search-field {
+	border-radius: 5px 0 0 5px !important;
+}		</style>
+		<meta property="fb:app_id" content="324648798462957">
+<link rel="stylesheet" type="text/css" href="./Autorelease Pool - Thành Vũ_files/shCore.css"><link rel="stylesheet" type="text/css" href="./Autorelease Pool - Thành Vũ_files/shThemeDefault.css"></head>
+<body class="post-template-default single single-post postid-147 single-format-standard"><div id="fb-root"></div>
+<script async="" defer="" crossorigin="anonymous" src="./Autorelease Pool - Thành Vũ_files/sdk(1).js"></script>
+
+<div id="page" class="hfeed site">
+<header id="masthead" role="banner">
+	<nav id="site-navigation" class="main-navigation navbar-fixed-top navbar-left" role="navigation">
+		<!-- Brand and toggle get grouped for better mobile display -->
+		<div class="container" id="navigation_menu">
+			<div class="navbar-header">
+									<button type="button" class="menu-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+						<span class="sr-only">Toggle navigation</span>
+						<span class="icon-bar"></span> 
+						<span class="icon-bar"></span>
+						<span class="icon-bar"></span>
+					</button>
+									<a class="navbar-brand" href="https://thanhvu.dev/">Thành Vũ</a>
+			</div><!-- .navbar-header -->
+			<div class="collapse navbar-collapse navbar-ex1-collapse"><ul id="menu-menu" class="primary-menu nav-menu" aria-expanded="false"><li id="menu-item-377" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-377"><a href="https://thanhvu.dev/about/">Giới thiệu</a></li>
+</ul></div>		</div><!--#container-->
+	</nav>
+	<div id="cc_spacer" style="height: 0px;"></div><!-- used to clear fixed navigation by the themes js -->  
+	<div class="site-header">
+		<div class="site-branding">
+			<a class="home-link" href="https://thanhvu.dev/" title="Thành Vũ" rel="home">
+				<h1 class="site-title">Thành Vũ</h1>
+				<h2 class="site-description">Blog chia sẻ kỹ thuật IT</h2>
+			</a>
+		</div><!--.site-branding-->
+	</div><!--.site-header-->
+</header>
+<div id="content" class="site-content">
+
+	<div class="container">
+		<div class="row">
+			<div id="primary" class="col-md-9 content-area">
+				<main id="main" role="main">
+
+									
+<article id="post-147" class="post-content post-147 post type-post status-publish format-standard has-post-thumbnail hentry category-kien-thuc-ky-thuat tag-advance-knowledge tag-ios tag-memory-management tag-objc">
+
+	
+	        <div class="featured-image">
+        	<img width="800" height="576" src="./Autorelease Pool - Thành Vũ_files/EventLoopDiagram1.gif" class="attachment-nisarg-full-width size-nisarg-full-width wp-post-image jetpack-lazy-image jetpack-lazy-image--handled" alt="" data-lazy-loaded="1">                    
+        </div>
+        
+	<header class="entry-header">
+		<span class="screen-reader-text">Autorelease Pool</span>
+					<h1 class="entry-title">Autorelease Pool</h1>
+		
+				<div class="entry-meta">
+			<h5 class="entry-date"><i class="fa fa-calendar-o"></i> <a href="https://thanhvu.dev/2019/06/26/autorelease-pool/" title="8:22 chiều" rel="bookmark"><time class="entry-date" datetime="2019-06-26T20:22:59+07:00" pubdate="">26 Tháng Sáu, 2019 </time></a><span class="byline"><span class="sep"></span><i class="fa fa-user"></i>
+<span class="author vcard"><a class="url fn n" href="https://thanhvu.dev/author/admin/" title="Xem tất cả bài viết bởi Thành Vũ" rel="author">Thành Vũ</a></span></span> <i class="fa fa-comments-o"></i><span class="screen-reader-text">Bình luận </span> <a href="https://thanhvu.dev/2019/06/26/autorelease-pool/#respond" class="comments-link">0 Bình luận</a></h5>
+		</div><!-- .entry-meta -->
+			</header><!-- .entry-header -->
+
+			<div class="entry-content">
+				
+<p>Gần đây mình khá tò mò về chủ đề này, nên mình quyết định tìm hiểu kỹ về nó. Sau khi đã thoả mãn sự tò mò thì nay mình viết bài chia sẻ về nó.</p>
+
+
+
+<h2>1. Bối cảnh</h2>
+
+
+
+<p>Bạn nào lập trình từ hồi non-arc thì sẽ rõ về <strong>autorelease pool</strong> hơn các bạn lập trình thời arc. Cùng xét ví dụ sau khi dùng non-arc, thời mà vẫn dùng <strong>retain</strong>, <strong>release</strong> bằng tay thay vì <strong><a href="https://thanhvu.dev/2019/06/29/arc-hoat-dong-nhu-nao/">ARC(Automatic Reference Counting)</a></strong> tự động thực hiện điều đó.</p>
+
+
+<pre class="brush: objc; title: ; notranslate" title="">-(void) run {
+    NSURL *baseURL = [self getBaseURL];
+    [baseURL retain];
+    // Other code...
+    [baseURL release];
+}
+
+-(NSURL *)getBaseURL {
+    NSURL *url = [NSURL URLWithString:@"https://thanhvu.dev"];
+    return url;
+}
+</pre>
+
+
+<p>Khi NSURL khởi tạo thì sẽ tự động gọi retain dẫn tới retain count tăng lên bằng 1. Sau khi return thì biến đó lại được bên caller retain tiếp (retain count 2). Điều khó khăn hiện tại là giờ làm sao để release biến url trong hàm getBaseURL. Vì khi ở hàm run không dùng nữa thì retain count còn 2 – 1 = 1. Nếu gọi thêm release lần nữa tức là 2 lần thì rất khó kiểm soát.</p>
+
+
+<pre class="brush: plain; title: ; notranslate" title="">-(NSURL *)getBaseURL {
+    NSURL *url = [NSURL URLWithString:@"https://thanhvu.dev"];
+    [url Release]; // Nếu làm như này thì không ổn, do url bị huỷ trước khi return mất rồi.
+    return url;
+    [url release]; // Như này cũng không được, vì return rồi thì đâu có chạy tiếp.
+}
+</pre>
+
+
+<p>Vì lý do như vậy nên <strong>autorelease</strong> và <strong>autorelease pool</strong> ra đời.</p>
+
+
+
+<h2>2. Khái niệm</h2>
+
+
+
+<p>Autorelease Pool là một thành phần chứa các object mà chúng sẽ được nhận message release khi mà pool bị huỷ (drain). </p>
+
+
+
+<p>Vậy autorelease pool có liên quan gì tới ví dụ bên trên?. Code bên nên được viết như sau.</p>
+
+
+<pre class="brush: plain; title: ; notranslate" title="">-(void) run {
+    NSURL *baseURL = [self getBaseURL];
+    [baseURL retain];
+    // Other code...
+    [baseURL release];
+}
+
+-(NSURL *)getBaseURL {
+    NSURL *url = [NSURL URLWithString:@"https://thanhvu.dev"];
+    return [url autorelease];
+}
+</pre>
+
+
+<p>Khi gọi autorelease thì objc runtime tự động lưu object đó vào trong pool. Và khi pool được huỷ (drain) thì nó sẽ giải phóng các object có trong đó. </p>
+
+
+
+<h4>Vậy thì pool đang ở đâu, tôi đâu có thấy cái pool nào trong đoạn code này.???</h4>
+
+
+
+<figure class="wp-block-pullquote"><blockquote><p>Apple có viết như này</p><cite>The Application Kit creates an autorelease pool on the main thread at the beginning of every cycle of the event loop, and drains it at the end, thereby releasing any autoreleased objects generated while processing an event. If you use the Application Kit, you therefore typically don’t have to create your own pools.</cite></blockquote></figure>
+
+
+
+<p> Mình thì hay tò mò, tải thử opensource framework CF thì không thấy đả động. Sau khi tìm hiểu thì hoá ra nó nằm ở trong Foundation.framework. Thử dùng công cụ disassembler hàm runMode:beforeDate: của <a href="https://thanhvu.dev/2019/07/04/runloop/">NSRunLoop</a> thì được kết quả như sau:</p>
+
+
+
+<pre class="EnlighterJSRAW" data-enlighter-language="asm" data-enlighter-theme="" data-enlighter-highlight="" data-enlighter-linenumbers="" data-enlighter-lineoffset="" data-enlighter-title="" data-enlighter-group="" style="display: none;">bool -[NSRunLoop runMode:beforeDate:](void * self, void * _cmd, void * arg2, void * arg3) {
+    rsi = _cmd;
+    r14 = arg3;
+    r15 = arg2;
+    r13 = self;
+    if (arg2 == 0x0) {
+            r12 = rsi;
+            if (_CFExecutableLinkedOnOrAfter(0x6) != 0x0) {
+                    var_-48 = @class(NSException);
+                    rbx = r14;
+                    r14 = *_NSInvalidArgumentException;
+                    __NSMethodExceptionProem(r13, r12);
+                    rdx = r14;
+                    r14 = rbx;
+                    [var_-48 raise:rdx format:@"%@: mode argument cannot be nil"];
+            }
+    }
+    if ((*(r13 + *_OBJC_IVAR_$_NSRunLoop._rl) != 0x0) &amp;&amp; (_CFRunLoopIsCurrent() != 0x0)) {
+            rdx = @"NSDefaultRunLoopMode";
+            if ([r15 isEqual:rdx] != 0x0) {
+                    r15 = *_kCFRunLoopDefaultMode;
+            }
+            if (_CFRunLoopFinished(*(r13 + *_OBJC_IVAR_$_NSRunLoop._rl), r15) != 0x0) {
+                    rax = 0x0;
+            }
+            else {
+                    rbx = _NSPushAutoreleasePool(0x0); // Khởi tạo pool
+                    [r14 timeIntervalSinceReferenceDate];
+                    var_-48 = intrinsic_movsd(var_-48, xmm0);
+                    CFAbsoluteTimeGetCurrent();
+                    intrinsic_movapd(xmm0, intrinsic_subsd(intrinsic_movsd(xmm1, var_-48), xmm0));
+                    CFRunLoopRunInMode(r15, 0x1, rdx);
+                    _NSPopAutoreleasePool(rbx); // Drain pool
+                    rax = 0x1;
+            }
+    }
+    else {
+            rax = 0x0;
+    }
+    return rax;
+}</pre><div class="EnlighterJSWrapper enlighterEnlighterJSWrapper"><ol class="hoverEnabled enlighterEnlighterJS EnlighterJS"><li class=" odd"><span class="kw3">bool</span><span class=""> -[NSRunLoop runMode:beforeDate:](void * self, void * _cmd, void * arg2, void * arg3) {</span></li><li class=" even"><span class="">    </span><span class="kw3">rsi</span><span class=""> = _cmd</span><span class="co1">;</span><span class=""></span></li><li class=" odd"><span class="">    </span><span class="kw3">r14</span><span class=""> = arg3</span><span class="co1">;</span><span class=""></span></li><li class=" even"><span class="">    </span><span class="kw3">r15</span><span class=""> = arg2</span><span class="co1">;</span><span class=""></span></li><li class=" odd"><span class="">    </span><span class="kw3">r13</span><span class=""> = self</span><span class="co1">;</span><span class=""></span></li><li class=" even"><span class="">    </span><span class="kw3">if</span><span class=""> (arg2 == </span><span class="nu0">0x0</span><span class="">) {</span></li><li class=" odd"><span class="">            </span><span class="kw3">r12</span><span class=""> = rsi</span><span class="co1">;</span><span class=""></span></li><li class=" even"><span class="">            </span><span class="kw3">if</span><span class=""> (</span><span class="me0">_CFExecutableLinkedOnOrAfter</span><span class="">(</span><span class="nu0">0x6</span><span class="">) != </span><span class="nu0">0x0</span><span class="">) {</span></li><li class=" odd"><span class="">                    var_-</span><span class="nu0">48</span><span class=""> = </span><span class="kw4">@class</span><span class="">(NSException)</span><span class="co1">;</span><span class=""></span></li><li class=" even"><span class="">                    </span><span class="kw3">rbx</span><span class=""> = r14</span><span class="co1">;</span><span class=""></span></li><li class=" odd"><span class="">                    </span><span class="kw3">r14</span><span class=""> = *_NSInvalidArgumentException</span><span class="co1">;</span><span class=""></span></li><li class=" even"><span class="">                    </span><span class="me0">__NSMethodExceptionProem</span><span class="">(r13, r12)</span><span class="co1">;</span><span class=""></span></li><li class=" odd"><span class="">                    </span><span class="kw3">rdx</span><span class=""> = r14</span><span class="co1">;</span><span class=""></span></li><li class=" even"><span class="">                    </span><span class="kw3">r14</span><span class=""> = rbx</span><span class="co1">;</span><span class=""></span></li><li class=" odd"><span class="">                    [var_-</span><span class="nu0">48</span><span class=""> raise</span><span class="kw3">:</span><span class="kw3">rdx</span><span class=""> format:@</span><span class="st0">"%@: mode argument cannot be nil"</span><span class="">]</span><span class="co1">;</span><span class=""></span></li><li class=" even"><span class="">            }</span></li><li class=" odd"><span class="">    }</span></li><li class=" even"><span class="">    </span><span class="kw3">if</span><span class=""> ((*(r13 + *_OBJC_IVAR_</span><span class="co2">$_NSRunLoop._rl) != 0x0) &amp;&amp; (_CFRunLoopIsCurrent() != 0x0)) {</span><span class=""></span></li><li class=" odd"><span class="">            </span><span class="kw3">rdx</span><span class=""> = @</span><span class="st0">"NSDefaultRunLoopMode"</span><span class="co1">;</span><span class=""></span></li><li class=" even"><span class="">            </span><span class="kw3">if</span><span class=""> ([r15 isEqual:rdx] != </span><span class="nu0">0x0</span><span class="">) {</span></li><li class=" odd"><span class="">                    </span><span class="kw3">r15</span><span class=""> = *_kCFRunLoopDefaultMode</span><span class="co1">;</span><span class=""></span></li><li class=" even"><span class="">            }</span></li><li class=" odd"><span class="">            </span><span class="kw3">if</span><span class=""> (</span><span class="me0">_CFRunLoopFinished</span><span class="">(*(r13 + *_OBJC_IVAR_</span><span class="co2">$_NSRunLoop._rl), r15) != 0x0) {</span><span class=""></span></li><li class=" even"><span class="">                    </span><span class="kw3">rax</span><span class=""> = </span><span class="nu0">0x0</span><span class="co1">;</span><span class=""></span></li><li class=" odd"><span class="">            }</span></li><li class=" even"><span class="">            </span><span class="kw3">else</span><span class=""> {</span></li><li class=" odd"><span class="">                    </span><span class="kw3">rbx</span><span class=""> = </span><span class="me0">_NSPushAutoreleasePool</span><span class="">(</span><span class="nu0">0x0</span><span class="">)</span><span class="co1">; // Khởi tạo pool</span><span class=""></span></li><li class=" even"><span class="">                    [r14 timeIntervalSinceReferenceDate]</span><span class="co1">;</span><span class=""></span></li><li class=" odd"><span class="">                    var_-</span><span class="nu0">48</span><span class=""> = </span><span class="me0">intrinsic_movsd</span><span class="">(var_-</span><span class="nu0">48</span><span class="">, xmm0)</span><span class="co1">;</span><span class=""></span></li><li class=" even"><span class="">                    </span><span class="me0">CFAbsoluteTimeGetCurrent</span><span class="">()</span><span class="co1">;</span><span class=""></span></li><li class=" odd"><span class="">                    </span><span class="me0">intrinsic_movapd</span><span class="">(xmm0, </span><span class="me0">intrinsic_subsd</span><span class="">(</span><span class="me0">intrinsic_movsd</span><span class="">(xmm1, var_-</span><span class="nu0">48</span><span class="">), xmm0))</span><span class="co1">;</span><span class=""></span></li><li class=" even"><span class="">                    </span><span class="me0">CFRunLoopRunInMode</span><span class="">(r15, </span><span class="nu0">0x1</span><span class="">, rdx)</span><span class="co1">;</span><span class=""></span></li><li class=" odd"><span class="">                    </span><span class="me0">_NSPopAutoreleasePool</span><span class="">(rbx)</span><span class="co1">; // Drain pool</span><span class=""></span></li><li class=" even"><span class="">                    </span><span class="kw3">rax</span><span class=""> = </span><span class="nu0">0x1</span><span class="co1">;</span><span class=""></span></li><li class=" odd"><span class="">            }</span></li><li class=" even"><span class="">    }</span></li><li class=" odd"><span class="">    </span><span class="kw3">else</span><span class=""> {</span></li><li class=" even"><span class="">            </span><span class="kw3">rax</span><span class=""> = </span><span class="nu0">0x0</span><span class="co1">;</span><span class=""></span></li><li class=" odd"><span class="">    }</span></li><li class=" even"><span class="">    </span><span class="kw3">return</span><span class=""> rax</span><span class="co1">;</span><span class=""></span></li><li class=" odd"><span class="">}</span></li></ol><pre style="display: none;">bool -[NSRunLoop runMode:beforeDate:](void * self, void * _cmd, void * arg2, void * arg3) {
+    rsi = _cmd;
+    r14 = arg3;
+    r15 = arg2;
+    r13 = self;
+    if (arg2 == 0x0) {
+            r12 = rsi;
+            if (_CFExecutableLinkedOnOrAfter(0x6) != 0x0) {
+                    var_-48 = @class(NSException);
+                    rbx = r14;
+                    r14 = *_NSInvalidArgumentException;
+                    __NSMethodExceptionProem(r13, r12);
+                    rdx = r14;
+                    r14 = rbx;
+                    [var_-48 raise:rdx format:@"%@: mode argument cannot be nil"];
+            }
+    }
+    if ((*(r13 + *_OBJC_IVAR_$_NSRunLoop._rl) != 0x0) &amp;&amp; (_CFRunLoopIsCurrent() != 0x0)) {
+            rdx = @"NSDefaultRunLoopMode";
+            if ([r15 isEqual:rdx] != 0x0) {
+                    r15 = *_kCFRunLoopDefaultMode;
+            }
+            if (_CFRunLoopFinished(*(r13 + *_OBJC_IVAR_$_NSRunLoop._rl), r15) != 0x0) {
+                    rax = 0x0;
+            }
+            else {
+                    rbx = _NSPushAutoreleasePool(0x0); // Khởi tạo pool
+                    [r14 timeIntervalSinceReferenceDate];
+                    var_-48 = intrinsic_movsd(var_-48, xmm0);
+                    CFAbsoluteTimeGetCurrent();
+                    intrinsic_movapd(xmm0, intrinsic_subsd(intrinsic_movsd(xmm1, var_-48), xmm0));
+                    CFRunLoopRunInMode(r15, 0x1, rdx);
+                    _NSPopAutoreleasePool(rbx); // Drain pool
+                    rax = 0x1;
+            }
+    }
+    else {
+            rax = 0x0;
+    }
+    return rax;
+}</pre></div>
+
+
+
+<p style="font-size:25px"><strong><em>Hoá ra autorelease pool luôn ở quanh ta, cho dù <a href="https://thanhvu.dev/2019/06/29/arc-hoat-dong-nhu-nao/">ARC</a> hay Non-ARC</em></strong><em> 😀</em></p>
+
+
+
+<p>Ơ nhưng nghe nói ARC không cho gọi <strong>autorelease</strong>, <strong>retain</strong>, <strong>release</strong> nữa cơ mà. Thực ra bản chất của ARC vẫn là Non-ARC, điểm khác là ARC nó chỉ giúp cho lập trình viên không phải gọi bằng tay các phương thức như autorelease, retain, release nữa mà nó sẽ tự động gọi cho ta khi compile. </p>
+
+
+
+<p><a href="https://thanhvu.dev/2019/06/29/arc-hoat-dong-nhu-nao/">Các bạn có thể nghĩ thằng này chém gió, lấy đâu ra thông tin vậy</a>. Thì mình xin thử run code ARC như sau.</p>
+
+
+<pre class="brush: objc; title: ; notranslate" title="">#import &lt;Foundation/Foundation.h&gt;
+
+@interface DemoClass: NSObject
+-(NSURL *) getURL;
+@end
+
+@implementation DemoClass
+
+-(NSURL *) getURL {
+    NSURL *url = [NSURL URLWithString:@"https://thanhvu.dev"];
+    return url;
+}
+
+@end
+
+int main(int argc, const char * argv[]) {
+    DemoClass *obj = [[DemoClass alloc] init];
+    NSURL *baseURL = [obj getURL];
+    
+    return 0;
+}
+
+</pre>
+
+
+<p>Ta tiến hành đặt debug vào trong method -[DemoClass getURL] và run. Tại cửa sổ debug lldb thì gõ lệnh “dis” và có kết quả lệnh assembly như sau.</p>
+
+
+
+<pre class="EnlighterJSRAW" data-enlighter-language="asm" data-enlighter-theme="" data-enlighter-highlight="" data-enlighter-linenumbers="" data-enlighter-lineoffset="" data-enlighter-title="" data-enlighter-group="" style="display: none;">ARC`-[DemoClass getURL]:
+    0x100000e20 &lt;+0&gt;:   push   rbp
+    0x100000e21 &lt;+1&gt;:   mov    rbp, rsp
+    0x100000e24 &lt;+4&gt;:   sub    rsp, 0x20
+    0x100000e28 &lt;+8&gt;:   mov    qword ptr [rbp - 0x8], rdi
+    0x100000e2c &lt;+12&gt;:  mov    qword ptr [rbp - 0x10], rsi
+    0x100000e30 &lt;+16&gt;:  mov    rdi, qword ptr [rip + 0x301] ; (void *)0x00007fff8f4640f0: NSURL
+    0x100000e37 &lt;+23&gt;:  mov    rsi, qword ptr [rip + 0x2da] ; "URLWithString:"
+    0x100000e3e &lt;+30&gt;:  lea    rdx, [rip + 0x1f3]        ; @"https://thanhvu.dev"
+    0x100000e45 &lt;+37&gt;:  mov    rax, qword ptr [rip + 0x1c4] ; (void *)0x00007fff5e822680: objc_msgSend
+    0x100000e4c &lt;+44&gt;:  call   rax
+    0x100000e4e &lt;+46&gt;:  mov    rdi, rax
+    0x100000e51 &lt;+49&gt;:  call   0x100000f2a               ; symbol stub for: objc_retainAutoreleasedReturnValue
+    0x100000e56 &lt;+54&gt;:  mov    qword ptr [rbp - 0x18], rax
+-&gt;  0x100000e5a &lt;+58&gt;:  mov    rdi, qword ptr [rbp - 0x18]
+    0x100000e5e &lt;+62&gt;:  mov    rax, qword ptr [rip + 0x1b3] ; (void *)0x00007fff5e822550: objc_retain
+    0x100000e65 &lt;+69&gt;:  call   rax
+    0x100000e67 &lt;+71&gt;:  xor    ecx, ecx
+    0x100000e69 &lt;+73&gt;:  mov    esi, ecx
+    0x100000e6b &lt;+75&gt;:  lea    rdi, [rbp - 0x18]
+    0x100000e6f &lt;+79&gt;:  mov    qword ptr [rbp - 0x20], rax
+    0x100000e73 &lt;+83&gt;:  call   0x100000f30               ; symbol stub for: objc_storeStrong
+    0x100000e78 &lt;+88&gt;:  mov    rax, qword ptr [rbp - 0x20]
+    0x100000e7c &lt;+92&gt;:  mov    rdi, rax
+    0x100000e7f &lt;+95&gt;:  add    rsp, 0x20
+    0x100000e83 &lt;+99&gt;:  pop    rbp
+    0x100000e84 &lt;+100&gt;: jmp    0x100000f24               ; symbol stub for: objc_autoreleaseReturnValue 
+    0x100000e89 &lt;+105&gt;: nop    dword ptr [rax]</pre><div class="EnlighterJSWrapper enlighterEnlighterJSWrapper"><ol class="hoverEnabled enlighterEnlighterJS EnlighterJS"><li class=" odd"><span class="">ARC`-[DemoClass getURL]</span><span class="kw3">:</span><span class=""></span></li><li class=" even"><span class="">    </span><span class="kw3">0x100000e20</span><span class=""> &lt;+</span><span class="nu0">0</span><span class="">&gt;</span><span class="kw3">:</span><span class="">   </span><span class="kw3">push</span><span class="">   rbp</span></li><li class=" odd"><span class="">    </span><span class="kw3">0x100000e21</span><span class=""> &lt;+</span><span class="nu0">1</span><span class="">&gt;</span><span class="kw3">:</span><span class="">   </span><span class="kw3">mov</span><span class="">    rbp, rsp</span></li><li class=" even"><span class="">    </span><span class="kw3">0x100000e24</span><span class=""> &lt;+</span><span class="nu0">4</span><span class="">&gt;</span><span class="kw3">:</span><span class="">   </span><span class="kw3">sub</span><span class="">    rsp, </span><span class="nu0">0x20</span><span class=""></span></li><li class=" odd"><span class="">    </span><span class="kw3">0x100000e28</span><span class=""> &lt;+</span><span class="nu0">8</span><span class="">&gt;</span><span class="kw3">:</span><span class="">   </span><span class="kw3">mov</span><span class="">    qword ptr [rbp - </span><span class="nu0">0x8</span><span class="">], rdi</span></li><li class=" even"><span class="">    </span><span class="kw3">0x100000e2c</span><span class=""> &lt;+</span><span class="nu0">12</span><span class="">&gt;</span><span class="kw3">:</span><span class="">  </span><span class="kw3">mov</span><span class="">    qword ptr [rbp - </span><span class="nu0">0x10</span><span class="">], rsi</span></li><li class=" odd"><span class="">    </span><span class="kw3">0x100000e30</span><span class=""> &lt;+</span><span class="nu0">16</span><span class="">&gt;</span><span class="kw3">:</span><span class="">  </span><span class="kw3">mov</span><span class="">    rdi, qword ptr [rip + </span><span class="nu0">0x301</span><span class="">] </span><span class="co1">; (void *)0x00007fff8f4640f0: NSURL</span><span class=""></span></li><li class=" even"><span class="">    </span><span class="kw3">0x100000e37</span><span class=""> &lt;+</span><span class="nu0">23</span><span class="">&gt;</span><span class="kw3">:</span><span class="">  </span><span class="kw3">mov</span><span class="">    rsi, qword ptr [rip + </span><span class="nu0">0x2da</span><span class="">] </span><span class="co1">; "URLWithString:"</span><span class=""></span></li><li class=" odd"><span class="">    </span><span class="kw3">0x100000e3e</span><span class=""> &lt;+</span><span class="nu0">30</span><span class="">&gt;</span><span class="kw3">:</span><span class="">  </span><span class="kw3">lea</span><span class="">    rdx, [rip + </span><span class="nu0">0x1f3</span><span class="">]        </span><span class="co1">; @"https://thanhvu.dev"</span><span class=""></span></li><li class=" even"><span class="">    </span><span class="kw3">0x100000e45</span><span class=""> &lt;+</span><span class="nu0">37</span><span class="">&gt;</span><span class="kw3">:</span><span class="">  </span><span class="kw3">mov</span><span class="">    rax, qword ptr [rip + </span><span class="nu0">0x1c4</span><span class="">] </span><span class="co1">; (void *)0x00007fff5e822680: objc_msgSend</span><span class=""></span></li><li class=" odd"><span class="">    </span><span class="kw3">0x100000e4c</span><span class=""> &lt;+</span><span class="nu0">44</span><span class="">&gt;</span><span class="kw3">:</span><span class="">  </span><span class="kw3">call</span><span class="">   rax</span></li><li class=" even"><span class="">    </span><span class="kw3">0x100000e4e</span><span class=""> &lt;+</span><span class="nu0">46</span><span class="">&gt;</span><span class="kw3">:</span><span class="">  </span><span class="kw3">mov</span><span class="">    rdi, rax</span></li><li class=" odd"><span class="">    </span><span class="kw3">0x100000e51</span><span class=""> &lt;+</span><span class="nu0">49</span><span class="">&gt;</span><span class="kw3">:</span><span class="">  </span><span class="kw3">call</span><span class="">   </span><span class="nu0">0x100000f2a</span><span class="">               </span><span class="co1">; symbol stub for: objc_retainAutoreleasedReturnValue</span><span class=""></span></li><li class=" even"><span class="">    </span><span class="kw3">0x100000e56</span><span class=""> &lt;+</span><span class="nu0">54</span><span class="">&gt;</span><span class="kw3">:</span><span class="">  </span><span class="kw3">mov</span><span class="">    qword ptr [rbp - </span><span class="nu0">0x18</span><span class="">], rax</span></li><li class=" odd"><span class="">-&gt;  </span><span class="nu0">0x100000e5a</span><span class=""> &lt;+</span><span class="nu0">58</span><span class="">&gt;</span><span class="kw3">:</span><span class="">  </span><span class="kw3">mov</span><span class="">    rdi, qword ptr [rbp - </span><span class="nu0">0x18</span><span class="">]</span></li><li class=" even"><span class="">    </span><span class="kw3">0x100000e5e</span><span class=""> &lt;+</span><span class="nu0">62</span><span class="">&gt;</span><span class="kw3">:</span><span class="">  </span><span class="kw3">mov</span><span class="">    rax, qword ptr [rip + </span><span class="nu0">0x1b3</span><span class="">] </span><span class="co1">; (void *)0x00007fff5e822550: objc_retain</span><span class=""></span></li><li class=" odd"><span class="">    </span><span class="kw3">0x100000e65</span><span class=""> &lt;+</span><span class="nu0">69</span><span class="">&gt;</span><span class="kw3">:</span><span class="">  </span><span class="kw3">call</span><span class="">   rax</span></li><li class=" even"><span class="">    </span><span class="kw3">0x100000e67</span><span class=""> &lt;+</span><span class="nu0">71</span><span class="">&gt;</span><span class="kw3">:</span><span class="">  </span><span class="kw3">xor</span><span class="">    ecx, ecx</span></li><li class=" odd"><span class="">    </span><span class="kw3">0x100000e69</span><span class=""> &lt;+</span><span class="nu0">73</span><span class="">&gt;</span><span class="kw3">:</span><span class="">  </span><span class="kw3">mov</span><span class="">    esi, ecx</span></li><li class=" even"><span class="">    </span><span class="kw3">0x100000e6b</span><span class=""> &lt;+</span><span class="nu0">75</span><span class="">&gt;</span><span class="kw3">:</span><span class="">  </span><span class="kw3">lea</span><span class="">    rdi, [rbp - </span><span class="nu0">0x18</span><span class="">]</span></li><li class=" odd"><span class="">    </span><span class="kw3">0x100000e6f</span><span class=""> &lt;+</span><span class="nu0">79</span><span class="">&gt;</span><span class="kw3">:</span><span class="">  </span><span class="kw3">mov</span><span class="">    qword ptr [rbp - </span><span class="nu0">0x20</span><span class="">], rax</span></li><li class=" even"><span class="">    </span><span class="kw3">0x100000e73</span><span class=""> &lt;+</span><span class="nu0">83</span><span class="">&gt;</span><span class="kw3">:</span><span class="">  </span><span class="kw3">call</span><span class="">   </span><span class="nu0">0x100000f30</span><span class="">               </span><span class="co1">; symbol stub for: objc_storeStrong</span><span class=""></span></li><li class=" odd"><span class="">    </span><span class="kw3">0x100000e78</span><span class=""> &lt;+</span><span class="nu0">88</span><span class="">&gt;</span><span class="kw3">:</span><span class="">  </span><span class="kw3">mov</span><span class="">    rax, qword ptr [rbp - </span><span class="nu0">0x20</span><span class="">]</span></li><li class=" even"><span class="">    </span><span class="kw3">0x100000e7c</span><span class=""> &lt;+</span><span class="nu0">92</span><span class="">&gt;</span><span class="kw3">:</span><span class="">  </span><span class="kw3">mov</span><span class="">    rdi, rax</span></li><li class=" odd"><span class="">    </span><span class="kw3">0x100000e7f</span><span class=""> &lt;+</span><span class="nu0">95</span><span class="">&gt;</span><span class="kw3">:</span><span class="">  </span><span class="kw3">add</span><span class="">    rsp, </span><span class="nu0">0x20</span><span class=""></span></li><li class=" even"><span class="">    </span><span class="kw3">0x100000e83</span><span class=""> &lt;+</span><span class="nu0">99</span><span class="">&gt;</span><span class="kw3">:</span><span class="">  </span><span class="kw3">pop</span><span class="">    rbp</span></li><li class=" odd"><span class="">    </span><span class="kw3">0x100000e84</span><span class=""> &lt;+</span><span class="nu0">100</span><span class="">&gt;</span><span class="kw3">:</span><span class=""> </span><span class="kw3">jmp</span><span class="">    </span><span class="nu0">0x100000f24</span><span class="">               </span><span class="co1">; symbol stub for: objc_autoreleaseReturnValue </span><span class=""></span></li><li class=" even"><span class="">    </span><span class="kw3">0x100000e89</span><span class=""> &lt;+</span><span class="nu0">105</span><span class="">&gt;</span><span class="kw3">:</span><span class=""> </span><span class="kw3">nop</span><span class="">    dword ptr [rax]</span></li></ol><pre style="display: none;">ARC`-[DemoClass getURL]:
+    0x100000e20 &lt;+0&gt;:   push   rbp
+    0x100000e21 &lt;+1&gt;:   mov    rbp, rsp
+    0x100000e24 &lt;+4&gt;:   sub    rsp, 0x20
+    0x100000e28 &lt;+8&gt;:   mov    qword ptr [rbp - 0x8], rdi
+    0x100000e2c &lt;+12&gt;:  mov    qword ptr [rbp - 0x10], rsi
+    0x100000e30 &lt;+16&gt;:  mov    rdi, qword ptr [rip + 0x301] ; (void *)0x00007fff8f4640f0: NSURL
+    0x100000e37 &lt;+23&gt;:  mov    rsi, qword ptr [rip + 0x2da] ; "URLWithString:"
+    0x100000e3e &lt;+30&gt;:  lea    rdx, [rip + 0x1f3]        ; @"https://thanhvu.dev"
+    0x100000e45 &lt;+37&gt;:  mov    rax, qword ptr [rip + 0x1c4] ; (void *)0x00007fff5e822680: objc_msgSend
+    0x100000e4c &lt;+44&gt;:  call   rax
+    0x100000e4e &lt;+46&gt;:  mov    rdi, rax
+    0x100000e51 &lt;+49&gt;:  call   0x100000f2a               ; symbol stub for: objc_retainAutoreleasedReturnValue
+    0x100000e56 &lt;+54&gt;:  mov    qword ptr [rbp - 0x18], rax
+-&gt;  0x100000e5a &lt;+58&gt;:  mov    rdi, qword ptr [rbp - 0x18]
+    0x100000e5e &lt;+62&gt;:  mov    rax, qword ptr [rip + 0x1b3] ; (void *)0x00007fff5e822550: objc_retain
+    0x100000e65 &lt;+69&gt;:  call   rax
+    0x100000e67 &lt;+71&gt;:  xor    ecx, ecx
+    0x100000e69 &lt;+73&gt;:  mov    esi, ecx
+    0x100000e6b &lt;+75&gt;:  lea    rdi, [rbp - 0x18]
+    0x100000e6f &lt;+79&gt;:  mov    qword ptr [rbp - 0x20], rax
+    0x100000e73 &lt;+83&gt;:  call   0x100000f30               ; symbol stub for: objc_storeStrong
+    0x100000e78 &lt;+88&gt;:  mov    rax, qword ptr [rbp - 0x20]
+    0x100000e7c &lt;+92&gt;:  mov    rdi, rax
+    0x100000e7f &lt;+95&gt;:  add    rsp, 0x20
+    0x100000e83 &lt;+99&gt;:  pop    rbp
+    0x100000e84 &lt;+100&gt;: jmp    0x100000f24               ; symbol stub for: objc_autoreleaseReturnValue 
+    0x100000e89 &lt;+105&gt;: nop    dword ptr [rax]</pre></div>
+
+
+
+<p>WTF, Ở dòng có địa chỉ “<strong>0x100000e84 &lt;+100&gt;</strong>” có gọi tới hàm objc_autoreleaseReturnValue kìa. :D. Chỗ đó là chỗ ARC nó gọi autorelease đó. Cũng giống như bên Non-ARC mà.</p>
+
+
+
+<h2>3. Khi nào thì nên dùng Autorelease Pool</h2>
+
+
+
+<p>Như 2 phần trên mình có giải thích, dù ra Non-ARC hay ARC thì vẫn dùng autorelease. Và mặc định pool được drain khi kết thúc <a href="https://thanhvu.dev/2019/07/04/runloop/">runloop</a>. </p>
+
+
+
+<p>Tuy nhiên có những trường hợp compiler không optimize được và ở đó thì mình gọi hàm rất nhiều lần, gây ra tình trạng bộ nhớ tăng lên mức quá cao và sau đó lại giảm xuống sau khi kết thúc <a href="https://thanhvu.dev/2019/07/04/runloop/">runloop</a> (drain pool). Mình có 1 ví dụ như sau. </p>
+
+
+
+<p><a href="https://github.com/ThanhDev2703/AutoreleasePool">https://github.com/ThanhDev2703/AutoreleasePool</a></p>
+
+
+<pre class="brush: objc; title: ; notranslate" title="">#import "ViewController.h"
+
+@interface ViewController ()
+
+@end
+
+@implementation ViewController
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    
+    [self runWithAutorelease];
+}
+
+-(void) run {
+    NSURL *url = [[NSBundle mainBundle] URLForResource:@"largeFile" withExtension:@"jpg"];
+    
+    for (int i = 0 ; i &lt; 100000; i++) {
+        NSData *data = [[NSData alloc] initWithContentsOfURL:url];
+        UIImage *image = [UIImage imageWithData:data];
+        
+        NSLog(@"image size %f %f", image.size.width, image.size.height);
+    }
+}
+
+-(void) runWithAutorelease {
+    NSURL *url = [[NSBundle mainBundle] URLForResource:@"largeFile" withExtension:@"jpg"];
+    
+    for (int i = 0 ; i &lt; 100000; i++) {
+        @autoreleasepool {
+            NSData *data = [[NSData alloc] initWithContentsOfURL:url];
+            UIImage *image = [UIImage imageWithData:data];
+            
+            NSLog(@"image size %f %f", image.size.width, image.size.height);
+        }
+    }
+}
+
+
+@end
+
+</pre>
+
+
+<figure class="wp-block-image"><img src="./Autorelease Pool - Thành Vũ_files/non.2019-06-26-17_39_01.gif" alt="" class="wp-image-210 jetpack-lazy-image" data-recalc-dims="1" data-lazy-src="https://i1.wp.com/thanhvu.dev/wp-content/uploads/2019/06/non.2019-06-26-17_39_01.gif?w=640&amp;is-pending-load=1#038;ssl=1" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"><noscript><img src="https://i1.wp.com/thanhvu.dev/wp-content/uploads/2019/06/non.2019-06-26-17_39_01.gif?w=640&#038;ssl=1" alt="" class="wp-image-210" data-recalc-dims="1"/></noscript><figcaption>Khi không sử dụng autorelease pool, memory tăng vèo vèo</figcaption></figure>
+
+
+
+<figure class="wp-block-image"><img src="./Autorelease Pool - Thành Vũ_files/autorelease.2019-06-26-17_42_31.gif" alt="" class="wp-image-209 jetpack-lazy-image" data-recalc-dims="1" data-lazy-src="https://i2.wp.com/thanhvu.dev/wp-content/uploads/2019/06/autorelease.2019-06-26-17_42_31.gif?w=640&amp;is-pending-load=1#038;ssl=1" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"><noscript><img src="https://i2.wp.com/thanhvu.dev/wp-content/uploads/2019/06/autorelease.2019-06-26-17_42_31.gif?w=640&#038;ssl=1" alt="" class="wp-image-209" data-recalc-dims="1"/></noscript><figcaption>Khi sử dụng autorelease pool, memory ổn định.</figcaption></figure>
+
+
+
+<p>Khi gọi hàm, các giá trị return (data và image) được lưu vào autorelease pool và sẽ giải phóng sau khi kết thúc <a href="https://thanhvu.dev/2019/07/04/runloop/">runloop</a>. Tuy nhiên số lượng lặp quá nhiều và bộ nhớ lớn lên nên gây ra bộ nhớ tăng mãi mà không release.</p>
+
+
+
+<p>Giải pháp chúng ta là đặt autorelease pool ở trong vòng for. Nó sẽ release biến data và image sau khi kết thúc pool thay vì phải đợi tới cuối <a href="https://thanhvu.dev/2019/07/04/runloop/">runloop</a>.</p>
+
+
+
+<h2>4. Tổng kết</h2>
+
+
+
+<p>Autorelease pool là một thành phần rất quan trọng trong iOS. </p>
+
+
+
+<p>Chúng ta nên sử dụng autorelease trong những trường hợp sau:</p>
+
+
+
+<ul><li>Khi bạn phát triển ứng dụng mà không dùng UIKit(Command line App), thì lúc này không có Autorelease Pool ở mỗi vòng lặp runloop nên chạy thời gian dài sẽ tăng memory cao dẫn tới dễ crash.</li><li>Khi bạn chạy vòng lặp nhiều chu kỳ và mỗi chu kỳ lại sử dụng nhiều biến, gọi nhiều hàm. Vấn đề này mình đã giải thích ở bên trên.</li><li>Khi bạn run nhiều hơn 1 thread, trường hợp nếu thread đó không chạy NSRunLoop và thread đó xử lý dữ liệu nhiều, chạy lâu, gọi nhiều hàm thì ta nên dùng AutoRelease Pool ở đây để tránh tình trạng memory tăng quá cao chưa kịp giảm xuống đã tèo cả App.</li></ul>
+
+
+
+<p>Cảm ơn mọi người đã đọc bài viết.</p>
+<div class="sharedaddy sd-sharing-enabled"><div class="robots-nocontent sd-block sd-social sd-social-icon-text sd-sharing"><h3 class="sd-title">Chia sẻ cho mọi người cùng biết nhé bạn:</h3><div class="sd-content"><ul><li class="share-twitter"><a rel="nofollow noopener noreferrer" data-shared="sharing-twitter-147" class="share-twitter sd-button share-icon" href="https://thanhvu.dev/2019/06/26/autorelease-pool/?share=twitter&amp;nb=1" target="_blank" title="Bấm để chia sẻ trên Twitter"><span>Twitter</span></a></li><li class="share-facebook"><a rel="nofollow noopener noreferrer" data-shared="sharing-facebook-147" class="share-facebook sd-button share-icon" href="https://thanhvu.dev/2019/06/26/autorelease-pool/?share=facebook&amp;nb=1" target="_blank" title="Nhấn vào chia sẻ trên Facebook"><span>Facebook</span></a></li><li class="share-skype"><a rel="nofollow noopener noreferrer" data-shared="sharing-skype-147" class="share-skype sd-button share-icon" href="https://thanhvu.dev/2019/06/26/autorelease-pool/?share=skype&amp;nb=1" target="_blank" title="Click to share on Skype"><span>Skype</span></a></li><li class="share-linkedin"><a rel="nofollow noopener noreferrer" data-shared="sharing-linkedin-147" class="share-linkedin sd-button share-icon" href="https://thanhvu.dev/2019/06/26/autorelease-pool/?share=linkedin&amp;nb=1" target="_blank" title="Bấm để chia sẻ lên LinkedIn"><span>LinkedIn</span></a></li><li class="share-end"></li></ul></div></div></div><div class="sharedaddy sd-block sd-like jetpack-likes-widget-wrapper jetpack-likes-widget-unloaded" id="like-post-wrapper-163663951-147-5f4327cce2b65" data-src="https://widgets.wp.com/likes/#blog_id=163663951&amp;post_id=147&amp;origin=thanhvu.dev&amp;obj_id=163663951-147-5f4327cce2b65" data-name="like-post-frame-163663951-147-5f4327cce2b65"><h3 class="sd-title">Like this:</h3><div class="likes-widget-placeholder post-likes-widget-placeholder" style="height: 55px;"><span class="button"><span>Like</span></span> <span class="loading">Đang tải...</span></div><span class="sd-text-color"></span><a class="sd-link-color"></a></div>
+<div id="jp-relatedposts" class="jp-relatedposts" style="display: block;">
+	<h3 class="jp-relatedposts-headline"><em>Có liên quan</em></h3>
+<div class="jp-relatedposts-items jp-relatedposts-items-visual jp-relatedposts-grid "><div class="jp-relatedposts-post jp-relatedposts-post0 jp-relatedposts-post-thumbs" data-post-id="853" data-post-format="false"><a class="jp-relatedposts-post-a" href="https://thanhvu.dev/2019/07/28/objective-c-runtime-part-3/" title="Objective-C Runtime Part 3 - Swift &amp; Objc Runtime
+
+Thậm chí iOS App của bạn được viết bằng swift hoàn toàn, thì bên trong nó đều sử dụng tới Objc Runtime. Bởi vì những thư viện cốt lõi đều được viết bằng Objc như Foundation, UIKit, .... Mà gắn với Objc thì tất nhiên phải có Objc Runtime rồi.…" data-origin="147" data-position="0"><img class="jp-relatedposts-post-img" src="./Autorelease Pool - Thành Vũ_files/Objective-C-Runtime-3.png" width="350" alt="Objective-C Runtime Part 3 - Swift &amp; Objc Runtime"></a><h4 class="jp-relatedposts-post-title"><a class="jp-relatedposts-post-a" href="https://thanhvu.dev/2019/07/28/objective-c-runtime-part-3/" title="Objective-C Runtime Part 3 - Swift &amp; Objc Runtime
+
+Thậm chí iOS App của bạn được viết bằng swift hoàn toàn, thì bên trong nó đều sử dụng tới Objc Runtime. Bởi vì những thư viện cốt lõi đều được viết bằng Objc như Foundation, UIKit, .... Mà gắn với Objc thì tất nhiên phải có Objc Runtime rồi.…" data-origin="147" data-position="0">Objective-C Runtime Part 3 - Swift &amp; Objc Runtime</a></h4><p class="jp-relatedposts-post-excerpt">Thậm chí iOS App của bạn được viết bằng swift hoàn toàn, thì bên trong nó đều sử dụng tới Objc Runtime. Bởi vì những thư viện cốt lõi đều được viết bằng Objc như Foundation, UIKit, .... Mà gắn với Objc thì tất nhiên phải có Objc Runtime rồi.…</p><p class="jp-relatedposts-post-date" style="display: block;">28 Tháng Bảy, 2019</p><p class="jp-relatedposts-post-context">Trong "Kiến thức kỹ thuật"</p></div><div class="jp-relatedposts-post jp-relatedposts-post1 jp-relatedposts-post-thumbs" data-post-id="1183" data-post-format="false"><a class="jp-relatedposts-post-a" href="https://thanhvu.dev/2019/09/15/debug-conflict-autolayout-constraints/" title="Debug conflict autolayout constraints
+
+Là lập trình viên iOS, chắc hẳn ai cũng biết về autolayout. Autolayout là tính năng giúp lập trình viên layout các thành phần để tạo ra giao diện cho app của mình. Tuy nhiên, có thể do vô tình mà chúng ta gây ra tình trạng conflict constraint( breaking…" data-origin="147" data-position="1"><img class="jp-relatedposts-post-img" src="./Autorelease Pool - Thành Vũ_files/Debug-Autolayout.png" width="350" alt="Debug conflict autolayout constraints"></a><h4 class="jp-relatedposts-post-title"><a class="jp-relatedposts-post-a" href="https://thanhvu.dev/2019/09/15/debug-conflict-autolayout-constraints/" title="Debug conflict autolayout constraints
+
+Là lập trình viên iOS, chắc hẳn ai cũng biết về autolayout. Autolayout là tính năng giúp lập trình viên layout các thành phần để tạo ra giao diện cho app của mình. Tuy nhiên, có thể do vô tình mà chúng ta gây ra tình trạng conflict constraint( breaking…" data-origin="147" data-position="1">Debug conflict autolayout constraints</a></h4><p class="jp-relatedposts-post-excerpt">Là lập trình viên iOS, chắc hẳn ai cũng biết về autolayout. Autolayout là tính năng giúp lập trình viên layout các thành phần để tạo ra giao diện cho app của mình. Tuy nhiên, có thể do vô tình mà chúng ta gây ra tình trạng conflict constraint( breaking…</p><p class="jp-relatedposts-post-date" style="display: block;">15 Tháng Chín, 2019</p><p class="jp-relatedposts-post-context">Trong "Kiến thức kỹ thuật"</p></div><div class="jp-relatedposts-post jp-relatedposts-post2 jp-relatedposts-post-thumbs" data-post-id="1271" data-post-format="false"><a class="jp-relatedposts-post-a" href="https://thanhvu.dev/2019/09/16/autolayout-priority/" title="Autolayout Priority
+
+Mình thấy rất nhiều bạn bị hổng kiến thức rất nhiều về autolayout, đặc biệt là phần Autolayout priority. Nay có thời gian rảnh thì mình sẽ viết về đề tài này để các bạn nắm được để giải quyết các vấn đề liên quan tới UI của App iOS.…" data-origin="147" data-position="2"><img class="jp-relatedposts-post-img" src="./Autorelease Pool - Thành Vũ_files/Autolayout-priority.png" width="350" alt="Autolayout Priority"></a><h4 class="jp-relatedposts-post-title"><a class="jp-relatedposts-post-a" href="https://thanhvu.dev/2019/09/16/autolayout-priority/" title="Autolayout Priority
+
+Mình thấy rất nhiều bạn bị hổng kiến thức rất nhiều về autolayout, đặc biệt là phần Autolayout priority. Nay có thời gian rảnh thì mình sẽ viết về đề tài này để các bạn nắm được để giải quyết các vấn đề liên quan tới UI của App iOS.…" data-origin="147" data-position="2">Autolayout Priority</a></h4><p class="jp-relatedposts-post-excerpt">Mình thấy rất nhiều bạn bị hổng kiến thức rất nhiều về autolayout, đặc biệt là phần Autolayout priority. Nay có thời gian rảnh thì mình sẽ viết về đề tài này để các bạn nắm được để giải quyết các vấn đề liên quan tới UI của App iOS.…</p><p class="jp-relatedposts-post-date" style="display: block;">16 Tháng Chín, 2019</p><p class="jp-relatedposts-post-context">Trong "Kiến thức kỹ thuật"</p></div></div></div>
+							</div><!-- .entry-content -->
+	<footer class="entry-footer">
+		<hr><div class="row"><div class="col-md-6 cattegories"><span class="cat-links"><i class="fa fa-folder-open"></i>
+		 <a href="https://thanhvu.dev/category/kien-thuc-ky-thuat/" rel="category tag">Kiến thức kỹ thuật</a></span></div><div class="col-md-6 tags"><span class="tags-links"><i class="fa fa-tags"></i> <a href="https://thanhvu.dev/tag/advance-knowledge/" rel="tag">Advance knowledge</a>, <a href="https://thanhvu.dev/tag/ios/" rel="tag">iOS</a>, <a href="https://thanhvu.dev/tag/memory-management/" rel="tag">Memory Management</a>, <a href="https://thanhvu.dev/tag/objc/" rel="tag">ObjC</a></span></div></div>	</footer><!-- .entry-footer -->
+			<!-- 	Begin comment -->
+<!--  	<div class="fb-comments" data-href="https://thanhvu.dev/2019/06/26/autorelease-pool/" data-width="100%" data-numposts="3" data-order-by="reverse_time"></div> -->
+<!-- 	End comment -->
+</article><!-- #post-## -->
+				</main><!-- #main -->
+				<div class="post-comments">
+					
+<div id="comments" class="comments-area">
+
+		
+		<div id="respond" class="comment-respond">
+							<h3 id="reply-title" class="comment-reply-title">Gửi phản hồi					<small><a rel="nofollow" id="cancel-comment-reply-link" href="https://thanhvu.dev/2019/06/26/autorelease-pool/#respond" style="display:none;">Hủy</a></small>
+				</h3>
+						<form id="commentform" class="comment-form">
+				<iframe title="Comment Form" src="./Autorelease Pool - Thành Vũ_files/saved_resource(5).html" style="width: 100%; height: 58px; border: 0px;" name="jetpack_remote_comment" class="jetpack_remote_comment" id="jetpack_remote_comment" sandbox="allow-same-origin allow-top-navigation allow-scripts allow-forms allow-popups" scrolling="no"></iframe>
+									<!--[if !IE]><!-->
+					<script>
+						document.addEventListener('DOMContentLoaded', function () {
+							var commentForms = document.getElementsByClassName('jetpack_remote_comment');
+							for (var i = 0; i < commentForms.length; i++) {
+								commentForms[i].allowTransparency = false;
+								commentForms[i].scrolling = 'no';
+							}
+						});
+					</script>
+					<!--<![endif]-->
+							</form>
+		</div>
+
+		
+		<input type="hidden" name="comment_parent" id="comment_parent" value="">
+
+		</div><!-- #comments -->
+				</div>
+							</div><!-- #primary -->
+			<div id="secondary" class="col-md-3 sidebar widget-area" role="complementary">
+		<aside id="search-2" class="widget widget_search">
+<form role="search" method="get" class="search-form" action="https://thanhvu.dev/">
+	<label>
+		<span class="screen-reader-text">Tìm kiếm:</span>
+		<input type="search" class="search-field" placeholder="Tìm kiếm …" value="" name="s" title="Tìm kiếm:">
+	</label>
+	<button type="submit" class="search-submit"><span class="screen-reader-text">Tìm kiếm</span></button>
+</form>
+</aside><aside id="custom_html-2" class="widget_text widget widget_custom_html"><h4 class="widget-title">About</h4><div class="textwidget custom-html-widget"><p>Tôi là lập trình viên iOS.</p>
+<p>Tôi đam mê công nghệ, thích tìm hiểu sâu về hệ thống, các thức vận hành của mọi thứ. Vì vậy tôi tạo blog này để viết ra những bài chia sẻ về những thứ hay ho tôi tìm ra được.</p>
+<a href="https://stackoverflow.com/users/5264045/thanh-vu"><img src="./Autorelease Pool - Thành Vũ_files/5264045.png" width="208" height="58" alt="profile for Thanh Vu at Stack Overflow, Q&amp;A for professional and enthusiast programmers" title="profile for Thanh Vu at Stack Overflow, Q&amp;A for professional and enthusiast programmers" style="border-radius: 4px;" class="jetpack-lazy-image jetpack-lazy-image--handled" data-lazy-loaded="1"><noscript><img src="https://stackoverflow.com/users/flair/5264045.png?theme=dark&cache=none" width="208" height="58" alt="profile for Thanh Vu at Stack Overflow, Q&amp;A for professional and enthusiast programmers" title="profile for Thanh Vu at Stack Overflow, Q&amp;A for professional and enthusiast programmers" style="border-radius: 4px;"></noscript></a>
+<hr>
+<u><a href="https://thanhvu.dev/about/">Thông tin thêm</a></u></div></aside><aside id="top-posts-2" class="widget widget_top-posts"><h4 class="widget-title">Bài &amp; Trang được đáng chú ý</h4><ul>				<li>
+					<a href="https://thanhvu.dev/2019/06/26/autorelease-pool/" class="bump-view" data-bump-view="tp" aria-current="page">Autorelease Pool</a>					</li>
+				</ul></aside>		<aside id="recent-posts-2" class="widget widget_recent_entries">		<h4 class="widget-title">Bài viết mới</h4>		<ul>
+											<li>
+					<a href="https://thanhvu.dev/2020/02/13/feature-flags/">Feature Flags</a>
+									</li>
+											<li>
+					<a href="https://thanhvu.dev/2019/10/26/advanced-debug-part-3/">Advanced Debug Part 3</a>
+									</li>
+											<li>
+					<a href="https://thanhvu.dev/2019/09/29/advanced-debug-part-2/">Advanced Debug Part 2</a>
+									</li>
+											<li>
+					<a href="https://thanhvu.dev/2019/09/22/advanced-debug-part-1/">Advanced Debug Part 1</a>
+									</li>
+											<li>
+					<a href="https://thanhvu.dev/2019/09/16/autolayout-priority/">Autolayout Priority</a>
+									</li>
+					</ul>
+		</aside><aside id="tag_cloud-5" class="widget widget_tag_cloud"><h4 class="widget-title">Thẻ</h4><div class="tagcloud"><a href="https://thanhvu.dev/tag/advance-knowledge/" class="tag-cloud-link tag-link-10 tag-link-position-1" style="font-size: 21.222222222222pt;" aria-label="Advance knowledge (13 mục)">Advance knowledge</a>
+<a href="https://thanhvu.dev/tag/arc/" class="tag-cloud-link tag-link-17 tag-link-position-2" style="font-size: 12.666666666667pt;" aria-label="ARC (3 mục)">ARC</a>
+<a href="https://thanhvu.dev/tag/assembly/" class="tag-cloud-link tag-link-13 tag-link-position-3" style="font-size: 10.8pt;" aria-label="Assembly (2 mục)">Assembly</a>
+<a href="https://thanhvu.dev/tag/autolayout/" class="tag-cloud-link tag-link-21 tag-link-position-4" style="font-size: 10.8pt;" aria-label="Autolayout (2 mục)">Autolayout</a>
+<a href="https://thanhvu.dev/tag/block/" class="tag-cloud-link tag-link-20 tag-link-position-5" style="font-size: 8pt;" aria-label="block (1 mục)">block</a>
+<a href="https://thanhvu.dev/tag/breakpoint/" class="tag-cloud-link tag-link-26 tag-link-position-6" style="font-size: 10.8pt;" aria-label="Breakpoint (2 mục)">Breakpoint</a>
+<a href="https://thanhvu.dev/tag/debugging/" class="tag-cloud-link tag-link-23 tag-link-position-7" style="font-size: 14.222222222222pt;" aria-label="Debugging (4 mục)">Debugging</a>
+<a href="https://thanhvu.dev/tag/development-process/" class="tag-cloud-link tag-link-27 tag-link-position-8" style="font-size: 8pt;" aria-label="Development Process (1 mục)">Development Process</a>
+<a href="https://thanhvu.dev/tag/internal/" class="tag-cloud-link tag-link-19 tag-link-position-9" style="font-size: 8pt;" aria-label="internal (1 mục)">internal</a>
+<a href="https://thanhvu.dev/tag/ios/" class="tag-cloud-link tag-link-4 tag-link-position-10" style="font-size: 22pt;" aria-label="iOS (15 mục)">iOS</a>
+<a href="https://thanhvu.dev/tag/lldb/" class="tag-cloud-link tag-link-24 tag-link-position-11" style="font-size: 12.666666666667pt;" aria-label="lldb (3 mục)">lldb</a>
+<a href="https://thanhvu.dev/tag/memory-management/" class="tag-cloud-link tag-link-9 tag-link-position-12" style="font-size: 14.222222222222pt;" aria-label="Memory Management (4 mục)">Memory Management</a>
+<a href="https://thanhvu.dev/tag/objc/" class="tag-cloud-link tag-link-5 tag-link-position-13" style="font-size: 21.688888888889pt;" aria-label="ObjC (14 mục)">ObjC</a>
+<a href="https://thanhvu.dev/tag/objc-runtime/" class="tag-cloud-link tag-link-18 tag-link-position-14" style="font-size: 15.466666666667pt;" aria-label="Objc runtime (5 mục)">Objc runtime</a>
+<a href="https://thanhvu.dev/tag/reverse-engineering/" class="tag-cloud-link tag-link-14 tag-link-position-15" style="font-size: 10.8pt;" aria-label="Reverse Engineering (2 mục)">Reverse Engineering</a>
+<a href="https://thanhvu.dev/tag/swift/" class="tag-cloud-link tag-link-6 tag-link-position-16" style="font-size: 10.8pt;" aria-label="Swift (2 mục)">Swift</a>
+<a href="https://thanhvu.dev/tag/ui/" class="tag-cloud-link tag-link-22 tag-link-position-17" style="font-size: 10.8pt;" aria-label="UI (2 mục)">UI</a>
+<a href="https://thanhvu.dev/tag/xcode/" class="tag-cloud-link tag-link-25 tag-link-position-18" style="font-size: 8pt;" aria-label="Xcode (1 mục)">Xcode</a></div>
+</aside><aside id="blog_subscription-2" class="widget widget_blog_subscription jetpack_subscription_widget"><h4 class="widget-title">Theo dõi blog bằng cách để lại email nhé 😜</h4>
+            <form action="https://thanhvu.dev/2019/06/26/autorelease-pool/#" method="post" accept-charset="utf-8" id="subscribe-blog-blog_subscription-2">
+				                    <div id="subscribe-text"><p>Nhập email của bạn để đăng ký thông báo bài viết mới qua email.</p>
+</div><p>Join 2 other subscribers</p>
+                    <p id="subscribe-email">
+                        <label id="jetpack-subscribe-label" class="screen-reader-text" for="subscribe-field-blog_subscription-2">
+							Email                        </label>
+                        <input type="email" name="email" required="required" class="required" value="" id="subscribe-field-blog_subscription-2" placeholder="Email">
+                    </p>
+
+                    <p id="subscribe-submit">
+                        <input type="hidden" name="action" value="subscribe">
+                        <input type="hidden" name="source" value="https://thanhvu.dev/2019/06/26/autorelease-pool/">
+                        <input type="hidden" name="sub-type" value="widget">
+                        <input type="hidden" name="redirect_fragment" value="blog_subscription-2">
+						                        <button type="submit" name="jetpack_subscriptions_widget">
+	                        Đăng ký                        </button>
+                    </p>
+				            </form>
+		
+</aside><aside id="archives-2" class="widget widget_archive"><h4 class="widget-title">Lưu trữ</h4>		<ul>
+				<li><a href="https://thanhvu.dev/2020/02/">Tháng Hai 2020</a></li>
+	<li><a href="https://thanhvu.dev/2019/10/">Tháng Mười 2019</a></li>
+	<li><a href="https://thanhvu.dev/2019/09/">Tháng Chín 2019</a></li>
+	<li><a href="https://thanhvu.dev/2019/08/">Tháng Tám 2019</a></li>
+	<li><a href="https://thanhvu.dev/2019/07/">Tháng Bảy 2019</a></li>
+	<li><a href="https://thanhvu.dev/2019/06/">Tháng Sáu 2019</a></li>
+		</ul>
+			</aside><aside id="blog-stats-2" class="widget blog-stats"><h4 class="widget-title">Blog Stats</h4><ul><li>3.602 lượt xem</li></ul></aside></div><!-- #secondary .widget-area -->
+
+
+		</div> <!--.row-->
+	</div><!--.container-->
+		</div><!-- #content -->
+	<footer id="colophon" class="site-footer" role="contentinfo">
+		<div class="site-info">
+			© 2020			<span class="sep"> | </span>
+			Proudly Powered by 			<a href="https://wordpress.org/">WordPress</a>
+			<span class="sep"> | </span>
+			Giao diện bởi <a href="https://wordpress.org/themes/nisarg/" rel="designer">Nisarg</a>		</div><!-- .site-info -->
+	</footer><!-- #colophon -->
+</div><!-- #page -->
+
+	<script type="text/javascript">
+		window.WPCOM_sharing_counts = {"https:\/\/thanhvu.dev\/2019\/06\/26\/autorelease-pool\/":147};
+	</script>
+				<script type="text/javascript" src="./Autorelease Pool - Thành Vũ_files/shCore.js"></script>
+<script type="text/javascript" src="./Autorelease Pool - Thành Vũ_files/shBrushObjC.js"></script>
+<script type="text/javascript" src="./Autorelease Pool - Thành Vũ_files/shBrushPlain.js"></script>
+<script type="text/javascript">
+	(function(){
+		var corecss = document.createElement('link');
+		var themecss = document.createElement('link');
+		var corecssurl = "https://thanhvu.dev/wp-content/plugins/syntaxhighlighter/syntaxhighlighter3/styles/shCore.css?ver=3.0.9b";
+		if ( corecss.setAttribute ) {
+				corecss.setAttribute( "rel", "stylesheet" );
+				corecss.setAttribute( "type", "text/css" );
+				corecss.setAttribute( "href", corecssurl );
+		} else {
+				corecss.rel = "stylesheet";
+				corecss.href = corecssurl;
+		}
+		document.head.appendChild( corecss );
+		var themecssurl = "https://thanhvu.dev/wp-content/plugins/syntaxhighlighter/syntaxhighlighter3/styles/shThemeDefault.css?ver=3.0.9b";
+		if ( themecss.setAttribute ) {
+				themecss.setAttribute( "rel", "stylesheet" );
+				themecss.setAttribute( "type", "text/css" );
+				themecss.setAttribute( "href", themecssurl );
+		} else {
+				themecss.rel = "stylesheet";
+				themecss.href = themecssurl;
+		}
+		document.head.appendChild( themecss );
+	})();
+	SyntaxHighlighter.config.strings.expandSource = '+ expand source';
+	SyntaxHighlighter.config.strings.help = '?';
+	SyntaxHighlighter.config.strings.alert = 'SyntaxHighlighter\n\n';
+	SyntaxHighlighter.config.strings.noBrush = 'Can\'t find brush for: ';
+	SyntaxHighlighter.config.strings.brushNotHtmlScript = 'Brush wasn\'t configured for html-script option: ';
+	SyntaxHighlighter.defaults['pad-line-numbers'] = false;
+	SyntaxHighlighter.defaults['toolbar'] = false;
+	SyntaxHighlighter.all();
+
+	// Infinite scroll support
+	if ( typeof( jQuery ) !== 'undefined' ) {
+		jQuery( function( $ ) {
+			$( document.body ).on( 'post-load', function() {
+				SyntaxHighlighter.highlight();
+			} );
+		} );
+	}
+</script>
+<script type="text/javascript" src="./Autorelease Pool - Thành Vũ_files/photon.min.js"></script>
+<script type="text/javascript" src="./Autorelease Pool - Thành Vũ_files/devicepx-jetpack.js"></script>
+<script type="text/javascript" src="./Autorelease Pool - Thành Vũ_files/bootstrap.js"></script>
+<script type="text/javascript" src="./Autorelease Pool - Thành Vũ_files/navigation.js"></script>
+<script type="text/javascript" src="./Autorelease Pool - Thành Vũ_files/skip-link-focus-fix.js"></script>
+<script type="text/javascript">
+/* <![CDATA[ */
+var screenReaderText = {"expand":"m\u1edf r\u1ed9ng menu con","collapse":"thu g\u1ecdn menu con"};
+/* ]]> */
+</script>
+<script type="text/javascript" src="./Autorelease Pool - Thành Vũ_files/nisarg.js"></script>
+<script type="text/javascript" src="./Autorelease Pool - Thành Vũ_files/comment-reply.min.js"></script>
+<script type="text/javascript" src="./Autorelease Pool - Thành Vũ_files/lazy-images.min.js"></script>
+<script type="text/javascript" src="./Autorelease Pool - Thành Vũ_files/mootools-core-yc.js"></script>
+<script type="text/javascript" src="./Autorelease Pool - Thành Vũ_files/EnlighterJS.min.js"></script>
+<script type="text/javascript" src="./Autorelease Pool - Thành Vũ_files/wp-embed.min.js"></script>
+<script type="text/javascript" src="./Autorelease Pool - Thành Vũ_files/postmessage.min.js"></script>
+<script type="text/javascript" src="./Autorelease Pool - Thành Vũ_files/jquery.jetpack-resize.min.js"></script>
+<script type="text/javascript" src="./Autorelease Pool - Thành Vũ_files/queuehandler.min.js"></script>
+<script type="text/javascript">
+/* <![CDATA[ */
+var sharing_js_options = {"lang":"en","counts":"1","is_stats_active":"1"};
+/* ]]> */
+</script>
+<script type="text/javascript" src="./Autorelease Pool - Thành Vũ_files/sharing.min.js"></script>
+<script type="text/javascript">
+var windowOpen;
+			jQuery( document.body ).on( 'click', 'a.share-twitter', function() {
+				// If there's another sharing window open, close it.
+				if ( 'undefined' !== typeof windowOpen ) {
+					windowOpen.close();
+				}
+				windowOpen = window.open( jQuery( this ).attr( 'href' ), 'wpcomtwitter', 'menubar=1,resizable=1,width=600,height=350' );
+				return false;
+			});
+var windowOpen;
+			jQuery( document.body ).on( 'click', 'a.share-facebook', function() {
+				// If there's another sharing window open, close it.
+				if ( 'undefined' !== typeof windowOpen ) {
+					windowOpen.close();
+				}
+				windowOpen = window.open( jQuery( this ).attr( 'href' ), 'wpcomfacebook', 'menubar=1,resizable=1,width=600,height=400' );
+				return false;
+			});
+var windowOpen;
+			jQuery( document.body ).on( 'click', 'a.share-skype', function() {
+				// If there's another sharing window open, close it.
+				if ( 'undefined' !== typeof windowOpen ) {
+					windowOpen.close();
+				}
+				windowOpen = window.open( jQuery( this ).attr( 'href' ), 'wpcomskype', 'menubar=1,resizable=1,width=305,height=665' );
+				return false;
+			});
+var windowOpen;
+			jQuery( document.body ).on( 'click', 'a.share-linkedin', function() {
+				// If there's another sharing window open, close it.
+				if ( 'undefined' !== typeof windowOpen ) {
+					windowOpen.close();
+				}
+				windowOpen = window.open( jQuery( this ).attr( 'href' ), 'wpcomlinkedin', 'menubar=1,resizable=1,width=580,height=450' );
+				return false;
+			});
+</script>
+	<iframe src="./Autorelease Pool - Thành Vũ_files/master.html" scrolling="no" id="likes-master" name="likes-master" style="display:none;"></iframe>
+	<div id="likes-other-gravatars"><div class="likes-text"><span>%d</span> bloggers like this:</div><ul class="wpl-avatars sd-like-gravatars"></ul></div>
+	<script type="text/javascript">/* <![CDATA[ */EnlighterJS_Config = {"selector":{"block":"pre.EnlighterJSRAW","inline":"code.EnlighterJSRAW"},"language":"generic","theme":"enlighter","indent":2,"hover":"hoverEnabled","showLinenumbers":true,"rawButton":false,"infoButton":false,"windowButton":false,"rawcodeDoubleclick":false,"grouping":true,"cryptex":{"enabled":false,"email":"mail@example.tld"}};!function(){var a=function(a){var b="Enlighter Error: ";console.error?console.error(b+a):console.log&&console.log(b+a)};return window.addEvent?"undefined"==typeof EnlighterJS?void a("Javascript Resources not loaded yet!"):"undefined"==typeof EnlighterJS_Config?void a("Configuration not loaded yet!"):void window.addEvent("domready",function(){EnlighterJS.Util.Init(EnlighterJS_Config.selector.block,EnlighterJS_Config.selector.inline,EnlighterJS_Config)}):void a("MooTools Framework not loaded yet!")}();;/* ]]> */</script>
+		<!--[if IE]>
+		<script type="text/javascript">
+			if ( 0 === window.location.hash.indexOf( '#comment-' ) ) {
+				// window.location.reload() doesn't respect the Hash in IE
+				window.location.hash = window.location.hash;
+			}
+		</script>
+		<![endif]-->
+		<script type="text/javascript">
+			(function () {
+				var comm_par_el = document.getElementById( 'comment_parent' ),
+					comm_par = ( comm_par_el && comm_par_el.value ) ? comm_par_el.value : '',
+					frame = document.getElementById( 'jetpack_remote_comment' ),
+					tellFrameNewParent;
+
+				tellFrameNewParent = function () {
+					if ( comm_par ) {
+						frame.src = "https://jetpack.wordpress.com/jetpack-comment/?blogid=163663951&postid=147&comment_registration=0&require_name_email=0&stc_enabled=1&stb_enabled=1&show_avatars=1&avatar_default=identicon&greeting=G%E1%BB%ADi+ph%E1%BA%A3n+h%E1%BB%93i&greeting_reply=Tr%E1%BA%A3+l%E1%BB%9Di+ph%E1%BA%A3n+h%E1%BB%93i+cho+%25s&color_scheme=light&lang=vi&jetpack_version=8.0&show_cookie_consent=10&has_cookie_consent=0&token_key=%3Bnormal%3B&sig=1299fe4b34a1a40a3e8a1352538e9fa876af8b9c#parent=https%3A%2F%2Fthanhvu.dev%2F2019%2F06%2F26%2Fautorelease-pool%2F" + '&replytocom=' + parseInt( comm_par, 10 ).toString();
+					} else {
+						frame.src = "https://jetpack.wordpress.com/jetpack-comment/?blogid=163663951&postid=147&comment_registration=0&require_name_email=0&stc_enabled=1&stb_enabled=1&show_avatars=1&avatar_default=identicon&greeting=G%E1%BB%ADi+ph%E1%BA%A3n+h%E1%BB%93i&greeting_reply=Tr%E1%BA%A3+l%E1%BB%9Di+ph%E1%BA%A3n+h%E1%BB%93i+cho+%25s&color_scheme=light&lang=vi&jetpack_version=8.0&show_cookie_consent=10&has_cookie_consent=0&token_key=%3Bnormal%3B&sig=1299fe4b34a1a40a3e8a1352538e9fa876af8b9c#parent=https%3A%2F%2Fthanhvu.dev%2F2019%2F06%2F26%2Fautorelease-pool%2F";
+					}
+				};
+
+				
+				if ( 'undefined' !== typeof addComment ) {
+					addComment._Jetpack_moveForm = addComment.moveForm;
+
+					addComment.moveForm = function ( commId, parentId, respondId, postId ) {
+						var returnValue = addComment._Jetpack_moveForm( commId, parentId, respondId, postId ),
+							cancelClick, cancel;
+
+						if ( false === returnValue ) {
+							cancel = document.getElementById( 'cancel-comment-reply-link' );
+							cancelClick = cancel.onclick;
+							cancel.onclick = function () {
+								var cancelReturn = cancelClick.call( this );
+								if ( false !== cancelReturn ) {
+									return cancelReturn;
+								}
+
+								if ( ! comm_par ) {
+									return cancelReturn;
+								}
+
+								comm_par = 0;
+
+								tellFrameNewParent();
+
+								return cancelReturn;
+							};
+						}
+
+						if ( comm_par == parentId ) {
+							return returnValue;
+						}
+
+						comm_par = parentId;
+
+						tellFrameNewParent();
+
+						return returnValue;
+					};
+				}
+
+				
+				// Do the post message bit after the dom has loaded.
+				document.addEventListener( 'DOMContentLoaded', function () {
+					var iframe_url = "https:\/\/jetpack.wordpress.com";
+					if ( window.postMessage ) {
+						if ( document.addEventListener ) {
+							window.addEventListener( 'message', function ( event ) {
+								var origin = event.origin.replace( /^http:\/\//i, 'https://' );
+								if ( iframe_url.replace( /^http:\/\//i, 'https://' ) !== origin ) {
+									return;
+								}
+								jQuery( frame ).height( event.data );
+							});
+						} else if ( document.attachEvent ) {
+							window.attachEvent( 'message', function ( event ) {
+								var origin = event.origin.replace( /^http:\/\//i, 'https://' );
+								if ( iframe_url.replace( /^http:\/\//i, 'https://' ) !== origin ) {
+									return;
+								}
+								jQuery( frame ).height( event.data );
+							});
+						}
+					}
+				})
+
+			})();
+		</script>
+
+		<script type="text/javascript" src="./Autorelease Pool - Thành Vũ_files/e-202035.js" async="async" defer="defer"></script>
+<script type="text/javascript">
+	_stq = window._stq || [];
+	_stq.push([ 'view', {v:'ext',j:'1:8.0',blog:'163663951',post:'147',tz:'7',srv:'thanhvu.dev'} ]);
+	_stq.push([ 'clickTrackerInit', '163663951', '147' ]);
+</script>
+
+
+<img src="./Autorelease Pool - Thành Vũ_files/g.gif" alt=":)" width="6" height="5" id="wpstats"></body></html>

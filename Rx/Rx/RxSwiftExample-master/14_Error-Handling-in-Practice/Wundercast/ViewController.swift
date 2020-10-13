@@ -1,0 +1,274 @@
+/*
+ * Copyright (c) 2014-2016 Razeware LLC
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+
+import UIKit
+import RxSwift
+import RxCocoa
+import MapKit
+import CoreLocation
+
+typealias Weather = ApiController.Weather
+var cachedData = [String: Weather]()
+
+class ViewController: UIViewController {
+
+    @IBOutlet weak var keyButton: UIButton!
+    @IBOutlet weak var geoLocationButton: UIButton!
+    @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
+    @IBOutlet weak var searchCityName: UITextField!
+    @IBOutlet weak var tempLabel: UILabel!
+    @IBOutlet weak var humidityLabel: UILabel!
+    @IBOutlet weak var iconLabel: UILabel!
+    @IBOutlet weak var cityNameLabel: UILabel!
+
+    let bag = DisposeBag()
+
+    let locationManager = CLLocationManager()
+
+    var keyTextField: UITextField?
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        // Do any additional setup after loading the view, typically from a nib.
+        _ = RxReachability.shared.startMonitor("api.openweathermap.org")
+        style()
+        keyButton.rx.tap.subscribe(onNext: {
+            self.requestKey()
+        }).disposed(by:bag)
+
+        let currentLocation = locationManager.rx.didUpdateLocations
+            .map() { locations in
+                return locations[0]
+            }
+            .filter() { location in
+                return location.horizontalAccuracy == kCLLocationAccuracyNearestTenMeters
+        }
+
+        let geoInput = geoLocationButton.rx.tap.asObservable().do(onNext: {
+            self.locationManager.requestWhenInUseAuthorization()
+            self.locationManager.startUpdatingLocation()
+
+            self.searchCityName.text = "Current Location"
+        })
+
+        let geoLocation = geoInput.flatMap {
+            return currentLocation.take(1)
+        }
+
+        let geoSearch = geoLocation.flatMap() { location in
+            return ApiController.shared.currentWeather(lat: location.coordinate.latitude, lon: location.coordinate.longitude)
+                .catchErrorJustReturn(ApiController.Weather.empty)
+        }
+
+        let searchInput = searchCityName.rx.controlEvent(.editingDidEndOnExit).asObservable()
+            .map { self.searchCityName.text }
+            .filter { ($0 ?? "").count > 0 }
+
+        let maxAttempts = 9
+        let retryHandler: (Observable<Error>) -> Observable<Int> = { e in
+            print("logger: retryHandler")
+            return e.enumerated().flatMap({ (arg) -> Observable<Int> in
+                print("logger: retryHandler flatMap")
+                let (attempt, error) = arg
+                if attempt >= maxAttempts - 1 {
+                    print("logger: retryHandler flatMap attempt >= maxAttempts - 1")
+                    return Observable.error(error)
+                } else if let casted = error as? ApiController.ApiError, casted == .invalidKey {
+                    print("logger: retryHandler flatMap casted = error as? ApiController.ApiError, casted == .invalidKey")
+                    return ApiController.shared.apiKey.filter {$0 != ""}.map { _ in return 1 }
+                } else if (error as NSError).code == -1009 {
+                    print("logger: retryHandler flatMap (error as NSError).code == -1009 ")
+                    return RxReachability.shared.status.filter {
+                        print($0);
+                        return $0 == .online
+
+                    }.map { _  in
+                        print("logger: 1 nhe")
+                        return 1 }
+                }
+                print("logger: == retrying after \(attempt + 1) seconds ==")
+                return Observable<Int>.timer(Double(attempt + 1), scheduler: MainScheduler.instance)
+                    .take(1)
+            })
+        }
+
+//        let retryHandler: (Observable<Error>) -> Observable<String> = { e in
+//            print("logger: retryHandler")
+//            return e.enumerated().flatMap({ (arg) -> Observable<String> in
+//                print("logger: retryHandler flatMap")
+//                let (attempt, error) = arg
+//                if attempt >= maxAttempts - 1 {
+//                    print("logger: retryHandler flatMap attempt >= maxAttempts - 1")
+//                    return Observable.error(error)
+//                } else if let casted = error as? ApiController.ApiError, casted == .invalidKey {
+//                    print("logger: retryHandler flatMap casted = error as? ApiController.ApiError, casted == .invalidKey")
+//                    return ApiController.shared.apiKey.filter {$0 != ""}.map { _ in return "333" }
+//                } else if (error as NSError).code == -1009 {
+//                    print("logger: retryHandler flatMap (error as NSError).code == -1009 ")
+//                    return RxReachability.shared.status.filter {
+//                        print($0);
+//                        return $0 == .online
+//
+//                    }.map { _  in
+//                        print("logger: 1 nhe")
+//                        return "123" }
+//                }
+//                print("== retrying after \(attempt + 1) seconds ==")
+//                return Observable.from(["1","2","3"])//Observable<String>.timer(Double(attempt + 1), scheduler: MainScheduler.instance).take(1)
+//            })
+//        }
+
+        
+        let textSearch = searchInput.flatMap { text -> Observable<ApiController.Weather> in
+            print("logger: textSearch")
+            return ApiController.shared.currentWeather(city: text ?? "Error")
+                .retryWhen(retryHandler)
+                .cache(key: text ?? "", displayErrorIn: self)
+                .catchError { error in
+                    print("logger: textSearch catchError")
+                    if let text = text, let cachedData = cachedData[text] {
+                        print("logger: textSearch catchError text = text, let cachedData = cachedData[text]")
+                        return Observable.just(cachedData)
+                    } else {
+                        print("logger: textSearch catchError else")
+                        return Observable.just(ApiController.Weather.empty)
+                    }
+            }
+        }
+
+        let search = Observable.from([geoSearch, textSearch])
+            .merge()
+            .asDriver(onErrorJustReturn: ApiController.Weather.empty)
+
+        let running = Observable.from([searchInput.map { _ in true },
+                                       geoInput.map { _ in true },
+                                       search.map { _ in false }.asObservable()])
+            .merge()
+            .startWith(true)
+            .asDriver(onErrorJustReturn: false)
+
+        search.map { "\($0.temperature)° C" }
+            .drive(tempLabel.rx.text)
+            .disposed(by:bag)
+
+        search.map { $0.icon }
+            .drive(iconLabel.rx.text)
+            .disposed(by:bag)
+
+        search.map { "\($0.humidity)%" }
+            .drive(humidityLabel.rx.text)
+            .disposed(by:bag)
+
+        search.map { $0.cityName }
+            .drive(cityNameLabel.rx.text)
+            .disposed(by:bag)
+
+        running.skip(1).drive(activityIndicator.rx.isAnimating).disposed(by:bag)
+        running.drive(tempLabel.rx.isHidden).disposed(by:bag)
+        running.drive(iconLabel.rx.isHidden).disposed(by:bag)
+        running.drive(humidityLabel.rx.isHidden).disposed(by:bag)
+        running.drive(cityNameLabel.rx.isHidden).disposed(by:bag)
+    }
+
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+    }
+
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        Appearance.applyBottomLine(to: searchCityName)
+    }
+
+    override var preferredStatusBarStyle: UIStatusBarStyle {
+        return .lightContent
+    }
+
+    override func didReceiveMemoryWarning() {
+        super.didReceiveMemoryWarning()
+        // Dispose of any resources that can be recreated.
+    }
+
+    func requestKey() {
+        func configurationTextField(textField: UITextField!) {
+            textField.text = "5b0afdc348787659e01e0b959f8d9175"
+            self.keyTextField = textField
+        }
+
+        let alert = UIAlertController(title: "Api Key",
+                                      message: "Add the api key:",
+                                      preferredStyle: UIAlertController.Style.alert)
+
+        alert.addTextField(configurationHandler: configurationTextField)
+
+        alert.addAction(UIAlertAction(title: "Ok", style: UIAlertAction.Style.default, handler:{ (UIAlertAction) in
+            ApiController.shared.apiKey.onNext(self.keyTextField?.text ?? "")
+        }))
+
+        alert.addAction(UIAlertAction(title: "Cancel", style: UIAlertAction.Style.destructive))
+
+        self.present(alert, animated: true)
+    }
+
+    // MARK: - Style
+
+    private func style() {
+        view.backgroundColor = UIColor.aztec
+        searchCityName.textColor = UIColor.ufoGreen
+        tempLabel.textColor = UIColor.cream
+        humidityLabel.textColor = UIColor.cream
+        iconLabel.textColor = UIColor.cream
+        cityNameLabel.textColor = UIColor.cream
+    }
+
+}
+
+extension ObservableType where E == Weather {
+
+    /// Custom cache operator
+
+    func cache(key: String, displayErrorIn viewController: UIViewController) -> Observable<E> {
+        print("logger: cache")
+        return self.observeOn(MainScheduler.instance).do(onNext: { data in
+            print("logger: cache onNext")
+            cachedData[key] = data
+        }, onError: { e in
+            print("logger: cache onError")
+            if let e = e as? ApiController.ApiError {
+                switch (e) {
+                case .cityNotFound:
+                    print("logger: cache onError City Name is invalid")
+                    InfoView.showIn(viewController: viewController, message: "City Name is invalid")
+                case .serverFailure:
+                    print("logger: cache onError Server error")
+                    InfoView.showIn(viewController: viewController, message: "Server error")
+                case .invalidKey:
+                    print("logger: cache onError Key is invalid")
+                    InfoView.showIn(viewController: viewController, message: "Key is invalid")
+                }
+            } else {
+                print("logger: cache onError An error occurred")
+                InfoView.showIn(viewController: viewController, message: "An error occurred")
+            }
+        })
+    }
+
+}

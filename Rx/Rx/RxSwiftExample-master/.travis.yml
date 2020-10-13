@@ -1,0 +1,24 @@
+# references:
+# * https://www.objc.io/issues/6-build-tools/travis-ci/
+# * https://github.com/supermarin/xcpretty#usage
+
+osx_image: xcode10
+language: swift
+
+# cache: cocoapods
+# before_install:
+# - gem install cocoapods # Since Travis is not always on latest version
+# - pod install --project-directory=Example
+
+env:
+  - ACTION=build PLATFORM=iOS DESTINATION='platform=iOS Simulator,name=iPhone XS' FOLDER=04_Observables-and-Subjects-in-Practice/ WORKSPACE=Combinestagram.xcworkspace SCHEME=Combinestagram
+  - ACTION=build PLATFORM=iOS DESTINATION='platform=iOS Simulator,name=iPhone XS' FOLDER=06_Filtering-Operators-In-Practice/ WORKSPACE=Combinestagram.xcworkspace SCHEME=Combinestagram
+  - ACTION=build PLATFORM=iOS DESTINATION='platform=iOS Simulator,name=iPhone XS' FOLDER=08_Transforming-Operators-in-Practice/ WORKSPACE=GitFeed.xcworkspace SCHEME=GitFeed
+  - ACTION=build PLATFORM=iOS DESTINATION='platform=iOS Simulator,name=iPhone XS' FOLDER=10_Combining-Operators-in-Practice/ WORKSPACE=OurPlanet.xcworkspace SCHEME=OurPlanet
+  - ACTION=build PLATFORM=iOS DESTINATION='platform=iOS Simulator,name=iPhone XS' FOLDER=12_Beginning-RxCocoa/ WORKSPACE=Wundercast.xcworkspace SCHEME=Wundercast
+  - ACTION=build PLATFORM=iOS DESTINATION='platform=iOS Simulator,name=iPhone XS' FOLDER=13_Intermediate-RxCocoa/ WORKSPACE=Wundercast.xcworkspace SCHEME=Wundercast
+  - ACTION=build PLATFORM=iOS DESTINATION='platform=iOS Simulator,name=iPhone XS' FOLDER=14_Error-Handling-in-Practice/ WORKSPACE=Wundercast.xcworkspace SCHEME=Wundercast
+
+script:
+  - pod update --project-directory="$FOLDER"
+  - set -o pipefail && xcodebuild -workspace "$FOLDER/$WORKSPACE" -scheme "$SCHEME" -destination "$DESTINATION" $ACTION | xcpretty

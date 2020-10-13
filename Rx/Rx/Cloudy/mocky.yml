@@ -1,0 +1,9 @@
+sources:                        # 2.1.
+    include:                    # 2.1.1
+    - ./Cloudy
+templates:
+- ./Pods/SwiftyMocky/Sources/Templates
+output:                         # 2.2
+    ./CloudyTests/Test Cases/Mock.generated.swift
+targets:                        # 2.3 (optional)
+    - CloudyTests

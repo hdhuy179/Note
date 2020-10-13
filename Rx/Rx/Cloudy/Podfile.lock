@@ -1,0 +1,26 @@
+PODS:
+  - Alamofire (5.2.2)
+  - Sourcery (1.0.0)
+  - SwiftyMocky (3.4.0):
+    - SwiftyMocky/Core (= 3.4.0)
+  - SwiftyMocky/Core (3.4.0):
+    - Sourcery (>= 0.17)
+
+DEPENDENCIES:
+  - Alamofire
+  - SwiftyMocky (= 3.4.0)
+
+SPEC REPOS:
+  trunk:
+    - Alamofire
+    - Sourcery
+    - SwiftyMocky
+
+SPEC CHECKSUMS:
+  Alamofire: 814429acc853c6c54ff123fc3d2ef66803823ce0
+  Sourcery: 928a146ea9b777fa64b0c6ce915c4128b4488cff
+  SwiftyMocky: 030e1f0e0669952287af29d38b4748461d22312d
+
+PODFILE CHECKSUM: 93847a44ca5c4436bc092a8b928226af3315bad1
+
+COCOAPODS: 1.9.1
